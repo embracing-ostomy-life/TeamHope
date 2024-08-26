@@ -1,0 +1,17 @@
+Django==5.0.4
+django_components
+
+django-allauth[azuread]
+django-oidc
+psycopg2-binary==2.9.9
+python-dotenv==1.0.1
+whitenoise==6.6.0
+django-redis==5.4.0
+django_components==0.77
+PyJWT==2.6.0
+requests==2.32.2
+cryptography==42.0.7
+pytailwindcss==0.2.0
+django-compressor==4.4
+
+certifi==2024.2.2

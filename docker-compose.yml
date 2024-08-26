@@ -1,0 +1,52 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: ${DBNAME}
+      POSTGRES_USER: ${DBUSER}
+      POSTGRES_PASSWORD: ${DBPASS}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+
+
+# version: '3'
+# services:
+#   postgres:
+#     image: postgres:14
+#     restart: always
+#     environment:
+#       POSTGRES_DB: 'postgres'
+#       POSTGRES_USER: 'postgres'
+#       POSTGRES_PASSWORD: 'TeamHope1'
+#     ports:
+#       - "5431:5432"
+#     expose:
+#       - "5431"
+#     volumes:
+#       - ./data:/var/lib/postgresql/data
+#   redis:
+#     image: redis:6
+#     ports:
+#       - "6379:6379"
+
+
+# image: postgres:14
+#     restart: always
+#     environment:
+#       POSTGRES_DB: ${DBNAME}
+#       POSTGRES_USER: ${DBUSER}
+#       POSTGRES_PASSWORD: ${DBPASS}
+#     ports:
+#       - "5432:5432"
+#     expose:
+#       - "5432"
+#     volumes:
+#       - ./data:/var/lib/postgresql/data

@@ -1,0 +1,29 @@
+{% extends "team_hope/base.html" %}
+{% load restaurant_extras %}
+{% block title %}Home{% endblock %}
+{% block head %}
+    {{ block.super }}
+{% endblock %}
+{% block content %}
+	<div id="get-target">
+	    <div class="flex items-baseline justify-center">
+	    	<h3 class="text-2xl font-bold text-center">Welcome, {{ user.get_full_name}}</h3>
+	    </div>
+	    <div button hx-get="/register/user_type" hx-target="#get-target" class="flex items-baseline justify-center">
+	    	{% if not user_profile_is_complete %}
+	    	<button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Complete your profile.</button>
+			{% else %}
+			<button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Profile Complete! Redo?</button>
+			{% endif %}
+		</div>
+		<div class="flex items-baseline justify-center">
+			{% if not chat_enabled %}
+	    	<button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Team Hope Chat (coming soon)</button>
+			{% else %}
+			<a href="/chat">
+				<button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Team Hope Chat</button>
+			</a>
+			{% endif %}
+	    </div>
+	</div>
+{% endblock content %}

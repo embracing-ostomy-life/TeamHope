@@ -1,0 +1,38 @@
+{% load static %}
+<nav class="bg-brand-green-seafoam fixed top-0 w-full">
+  <div class="container mx-auto px-3">
+      <div class="flex items-center justify-between py-4">
+          <a href="/home" class="flex">
+                <img src="https://embracingostomylife.org/wp-content/uploads/graphics/teamhope-logo.png" alt="Team Hope Logo" class="h-12 w-auto">
+          </a>
+          <a href="https://embracingostomylife.org" class="flex items-center">
+                <img src="{% static 'logo.png' %}" alt="Embracing Ostomy Life Logo" class="flex items-center -ml-6">
+          </a>
+          <button id="dropdown-toggle" class="text-white focus:outline-none">
+              Menu
+          </button>
+      </div>
+      <div id="dropdown-menu" class="hidden">
+          <div class="flex justify-end">
+              <div class="flex flex-col"> <!-- Flex column for links -->
+                  {% if request.user.is_active and request.user.is_staff %}
+                      <a href="{% url 'admin:index' %}" class="block py-2 text-white hover:bg-gray-700">Admin Panel</a>
+                  {% endif %}
+                  <form id="logout-form" action="{% url 'azure_b2c_logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="text-white">Logout</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+</nav>
+
+<script>
+  const toggleButton = document.getElementById('dropdown-toggle');
+  const dropdownMenu = document.getElementById('dropdown-menu');
+
+  toggleButton.addEventListener('click', () => {
+      dropdownMenu.classList.toggle('hidden');
+  });
+</script>

@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chat - Team Hope - Embracing Ostomy Life</title>
+        <link rel="icon"href="{% static 'favicon.ico' %}">
+        <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.js" integrity="sha384-qbtR4rS9RrUMECUWDWM2+YGgN3U4V4ZncZ0BvUcg9FGct0jqXz3PUdVpU1p0yrXS" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="{% static 'src/output.css' %}">
+        <style>
+          body {
+              padding-top: 4.5rem;
+          }
+        </style>
+        {% if DEPLOYENV == 'prod' %}
+            <script defer src="{% static 'chat/cometchatwidget.js' %}"></script>
+        {% endif %}
+        {% if DEPLOYENV == 'test' %}
+            <script defer src="{% static 'testchat/cometchatwidget.js' %}"></script>
+        {% endif %}
+        {% if DEPLOYENV == 'local' %}
+            <script defer src="{% static 'localchat/cometchatwidget.js' %}"></script>
+        {% endif %}
+    {% endblock %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    {% include 'team_hope/tailwind_nav.html' %}
+    <div id='mainwindow' class="flex justify-center m-4">
+            <div id="cometchat"></div>
+            <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+                CometChatWidget.init({
+                    "appID": "{{ COMET_APP_ID }}",
+                    "appRegion": "{{ COMET_REGION }}",
+                    "authKey": "{{ COMET_AUTH_KEY }}"
+                }).then(response => {
+                    console.log("Initialization completed successfully");
+                    const windowHeight = window.innerHeight;
+                    const bodyWidth = document.body.offsetWidth;
+                    //You can now call login function.
+                    CometChatWidget.login({
+                        "uid": '{{ UID }}'
+                    }).then(response => {
+                        CometChatWidget.launch({
+                            "widgetID": "27be47aa-57bb-4acd-a810-7523bea0aafa",
+                            "target": "#cometchat",
+                            "roundedCorners": "true",
+                            "height": `${windowHeight * .85}px`,
+                            "width": `${bodyWidth * .9}px`,
+                            "defaultID": '{{ UID }}', //default UID (user) or GUID (group) to show,
+                            "defaultType": 'user' //user or group
+                        });
+                    }, error => {
+                        console.log("User login failed with error:", error);
+                        //Check the reason for error and take appropriate action.
+                    });
+                }, error => {
+                    console.log("Initialization failed with error:", error);
+                    //Check the reason for error and take appropriate action.
+                });
+            });
+            </script>
+      </div>
+</body>
+</html>

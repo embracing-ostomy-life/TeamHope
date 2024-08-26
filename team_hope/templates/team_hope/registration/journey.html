@@ -1,0 +1,14 @@
+<form hx-post="register/journey">
+	<h3 class="w-full text-2xl font-bold text-center">Optional: Is there anything you want to share about your ostomy journey?</h3>
+	<div class="break"></div>
+	<textarea id="journey" name="journey" class="input" maxlength="4000">
+	</textarea>
+	<div class="break"></div>
+	<button hx-target="#get-target" hx-post="/register/journey"
+		class="w-full  px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Share
+	</button>
+	<div class="break"></div>
+	<button hx-target="#get-target" hx-get="/register/journey"
+		class="w-full  px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">No thanks
+	</button>
+</form>
