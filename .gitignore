@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 .azure
+
+#All files in the docker/data folder
+docker/data/*
