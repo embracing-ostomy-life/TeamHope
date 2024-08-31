@@ -34,7 +34,7 @@ AZURE_B2C_CLIENT_SECRET = os.getenv('AZURE_B2C_CLIENT_SECRET')
 AZURE_B2C_TENANT = os.getenv('AZURE_B2C_TENANT')
 AZURE_B2C_DOMAIN = os.getenv('AZURE_B2C_DOMAIN')
 AZURE_B2C_POLICY_NAME = os.getenv('AZURE_B2C_POLICY_NAME')
-AZURE_B2C_REDIRECT_URI = os.getenv('AZURE_B2C_REDIRECT_URI')
+AZURE_B2C_REDIRECT_URI = os.getenv('DEV_AZURE_B2C_REDIRECT_URI')
 
 
 AZURE_B2C_AUTH_URL = f'https://{AZURE_B2C_TENANT}.b2clogin.com/{AZURE_B2C_TENANT}.onmicrosoft.com/oauth2/v2.0/authorize?p={AZURE_B2C_POLICY_NAME}&client_id={AZURE_B2C_CLIENT_ID}&response_type=id_token&redirect_uri={{redirect_uri}}&response_mode=query&scope=openid%20profile%20email&state=12345'
@@ -152,25 +152,25 @@ WSGI_APPLICATION = 'azureproject.wsgi.application'
 
 # Configure Postgres database for local development
 #   Set these environment variables in the .env file for this project.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DBNAME'),
-        'HOST': os.environ.get('DBHOST'),
-        'USER': os.environ.get('DBUSER'),
-        'PASSWORD': os.environ.get('DBPASS'),
-    }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',#os.environ.get('DBNAME'),
-#         'HOST': 'localhost',#os.environ.get('DBHOST'),
-#         'PORT': '5431',#os.environ.get('DBPORT'),
-#         'USER': 'postgres',#os.environ.get('DBUSER'),
-#         'PASSWORD': 'TeamHope1',#os.environ.get('DBPASS'),
+#         'NAME': os.environ.get('DBNAME'),
+#         'HOST': os.environ.get('DBHOST'),
+#         'USER': os.environ.get('DBUSER'),
+#         'PASSWORD': os.environ.get('DBPASS'),
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',#os.environ.get('DBNAME'),
+        'HOST': 'localhost',#os.environ.get('DBHOST'),
+        'PORT': '5431',#os.environ.get('DBPORT'),
+        'USER': 'postgres',#os.environ.get('DBUSER'),
+        'PASSWORD': 'TeamHope1',#os.environ.get('DBPASS'),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -189,24 +189,24 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': 'redis://localhost:6379/1',  # Replace with your Redis server's location
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#         }
-#     }
-# }
 CACHES = {
-        "default": {  
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.environ.get('CACHELOCATION'),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://localhost:6379/1',  # Replace with your Redis server's location
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
     }
 }
+# CACHES = {
+#         "default": {  
+#             "BACKEND": "django_redis.cache.RedisCache",
+#             "LOCATION": os.environ.get('CACHELOCATION'),
+#             "OPTIONS": {
+#                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         },
+#     }
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
