@@ -34,7 +34,7 @@ AZURE_B2C_CLIENT_SECRET = os.getenv('AZURE_B2C_CLIENT_SECRET')
 AZURE_B2C_TENANT = os.getenv('AZURE_B2C_TENANT')
 AZURE_B2C_DOMAIN = os.getenv('AZURE_B2C_DOMAIN')
 AZURE_B2C_POLICY_NAME = os.getenv('AZURE_B2C_POLICY_NAME')
-AZURE_B2C_REDIRECT_URI = os.getenv('AZURE_B2C_REDIRECT_URI')
+AZURE_B2C_REDIRECT_URI = os.getenv('DEV_AZURE_B2C_REDIRECT_URI')
 
 
 AZURE_B2C_AUTH_URL = f'https://{AZURE_B2C_TENANT}.b2clogin.com/{AZURE_B2C_TENANT}.onmicrosoft.com/oauth2/v2.0/authorize?p={AZURE_B2C_POLICY_NAME}&client_id={AZURE_B2C_CLIENT_ID}&response_type=id_token&redirect_uri={{redirect_uri}}&response_mode=query&scope=openid%20profile%20email&state=12345'

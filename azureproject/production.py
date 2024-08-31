@@ -9,6 +9,8 @@ ALLOWED_HOSTS = [os.environ['CUSTOM_WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in
 CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['CUSTOM_WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
 DEBUG = False
 
+print('\n\n\n\nIn production settings :)\n\n\n\n')
+
 # WhiteNoise configuration
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -20,6 +22,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
