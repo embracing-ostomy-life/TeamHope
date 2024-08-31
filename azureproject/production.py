@@ -3,13 +3,21 @@ import os
 from .settings import *  # noqa
 from .settings import BASE_DIR
 
+
+print('\n\n\n\nIn production settings :)\n\n\n\n')
+
 # Configure the domain name using the environment variable
 # that Azure automatically creates for us.
 ALLOWED_HOSTS = [os.environ['CUSTOM_WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
 CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['CUSTOM_WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
 DEBUG = False
 
-print('\n\n\n\nIn production settings :)\n\n\n\n')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 
 # WhiteNoise configuration
 MIDDLEWARE = [
