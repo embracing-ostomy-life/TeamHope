@@ -30,7 +30,9 @@ urlpatterns = [
     path('register/location', register_location, name='register_location'),
 
     # take in journey, display confirmation
-    path('register/journey', register_journey, name='register_confirm'),
+    path('register/journey', register_journey, name='register_journey'),
+
+    path('register/confirm/', register_confirm, name='register_confirm'),
 
     path('chat', chat, name='chat'),
 ]

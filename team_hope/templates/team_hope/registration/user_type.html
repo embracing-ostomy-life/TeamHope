@@ -1,19 +1,12 @@
-<div id="get-target" class="flex-column justify-center">
-		<h3 class="w-full text-2xl font-bold text-center">Which one best describes you?</h3>
-		<div class="break"></div>
-		<button hx-target="#get-target" hx-get="/register/register_type?type=0"
-			class="w-full  px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Considering Surgery
-		</button>
-		<div class="break"></div>
-		<button hx-target="#get-target" hx-get="/register/register_type?type=1"
-			class="w-full  px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Ostomate
-		</button>
-		<div class="break"></div>
-		<button hx-target="#get-target" hx-get="/register/register_type?type=2"
-			class="w-full  px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Caregiver
-		</button>
-		<div class="break"></div>
-		<button hx-target="#get-target" hx-get="/register/register_type?type=3"
-			class="w-full  px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Medical Professional
-		</button>
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <div id="get-target" class="d-flex flex-column align-items-center">
+            <h3 class="w-100 text-center font-weight-bold">Which one best describes you?</h3>
+            <div class="w-100 my-3"></div>
+            <button hx-target="#get-target" hx-get="/register/register_type?type=0" class="btn btn-primary btn-block mb-3">Considering Surgery</button>
+            <button hx-target="#get-target" hx-get="/register/register_type?type=1" class="btn btn-primary btn-block mb-3">Ostomate</button>
+            <button hx-target="#get-target" hx-get="/register/register_type?type=2" class="btn btn-primary btn-block mb-3">Caregiver</button>
+            <button hx-target="#get-target" hx-get="/register/register_type?type=3" class="btn btn-primary btn-block mb-3">Medical Professional</button>
+        </div>
+    </div>
 </div>

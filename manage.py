@@ -16,7 +16,7 @@ def main():
         load_dotenv('./.env')
 
     # When running on Azure App Service you should use the production settings.
-    settings_module = "azureproject.production" if 'WEBSITE_HOSTNAME' in os.environ else 'azureproject.settings'
+    settings_module = "embracing_ostomy_life.production" if 'WEBSITE_HOSTNAME' in os.environ else 'embracing_ostomy_life.settings'
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 
     try:

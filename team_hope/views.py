@@ -176,6 +176,8 @@ def register_location(request):
         if request.method == 'POST':
             current_user = request.user
             country = request.POST.get('country')
+            if country == '':
+                return render(request, 'team_hope/registration/location.html')
             if country and country in state_countries_dict:
                 profile, created = UserProfile.objects.get_or_create(user=current_user)
                 profile.country = country
@@ -186,8 +188,21 @@ def register_location(request):
         return render(request, 'team_hope/' + tgt_page)
     return redirect(home)
 
+# def register_journey(request):
+#     tgt_page = "registration/confirm.html"
+#     if request.user.is_authenticated:
+#         current_user = request.user
+#         if request.method == 'POST':
+#             journey = request.POST.get('journey')
+#             if journey:
+#                 profile, created = UserProfile.objects.get_or_create(user=current_user)
+#                 profile.journey = journey[:4000]
+#                 profile.save()
+#         print("Redirecting to confirm page")
+#         return render(request, 'team_hope/' + tgt_page)
+#     print("Redirecting to home")
+#     return redirect(home)
 def register_journey(request):
-    tgt_page = "registration/confirm.html"
     if request.user.is_authenticated:
         current_user = request.user
         if request.method == 'POST':
@@ -196,14 +211,46 @@ def register_journey(request):
                 profile, created = UserProfile.objects.get_or_create(user=current_user)
                 profile.journey = journey[:4000]
                 profile.save()
-        return render(request, 'team_hope/' + tgt_page)
-    return redirect(home)
-
+            print("Redirecting to confirm page")
+            return redirect('register_confirm')  # Redirect to the register_confirm view
+        return render(request, 'team_hope/registration/journey.html')  # Render the journey page again if GET or invalid POST
+    print("Redirecting to home")
+    return redirect('home')
+# def register_confirm(request):
+#     tgt_page = "registration/confirm.html"
+#     if request.user.is_authenticated:
+#         return render(request, 'team_hope/' + tgt_page)
+#     return redirect(home)
+# def register_confirm(request):
+#     form = RegisterForm()  # Create an instance of your form
+#     if request.method == 'POST':
+#         form = RegisterForm(request.POST)
+#         if form.is_valid():
+#             # Process the form data
+#             pass
+#     return render(request, 'confirm.html', {'form': form})
 def register_confirm(request):
+    print("register_confirm view is called")
     tgt_page = "registration/confirm.html"
-    if request.user.is_authenticated:
-        return render(request, 'team_hope/' + tgt_page)
-    return redirect(home)
+    form = RegisterForm()
+    print("Form:", form)
+    return render(request, 'team_hope/' + tgt_page)
+
+# def register_confirm(request):
+#     print("register_confirm view is called")
+#     tgt_page = "registration/confirm.html"
+#     if request.user.is_authenticated:
+#         form = RegisterForm()
+#         print("Initial form:", form)  # Add this line
+#         if request.method == 'POST':
+#             form = RegisterForm(request.POST)
+#             print("Form after POST:", form)  # Add this line
+#             if form.is_valid():
+#                 # Process the form data here
+#                 pass
+#         return render(request, 'team_hope/' + tgt_page)
+#     return redirect(home)
+
 
 def chat(request):
     tgt_page = "chat.html"

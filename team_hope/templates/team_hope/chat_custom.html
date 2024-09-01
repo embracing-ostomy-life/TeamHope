@@ -1,67 +1,46 @@
-{% extends "team_hope/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Chat App{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto">
-    <ul class="flex border-b">
-        <li class="mr-4">
-            <a href="#contacts" class="py-2 px-4 text-gray-600 hover:text-gray-800">Contacts</a>
+<div class="container">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="contacts-tab" data-bs-toggle="tab" href="#contacts">Contacts</a>
         </li>
-        <li>
-            <a href="#chats" class="py-2 px-4 text-gray-600 hover:text-gray-800">Chats</a>
+        <li class="nav-item">
+            <a class="nav-link" id="chats-tab" data-bs-toggle="tab" href="#chats">Chats</a>
         </li>
     </ul>
-    <div id="contacts" class="mt-4">
-        {% if contacts %}
-            <ul>
-                {% for contact in contacts %}
-                    <li>{{ contact.name }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You have no contacts; check back soon.</p>
-        {% endif %}
+    
+    <!-- Tab panes -->
+    <div class="tab-content mt-4">
+        <div class="tab-pane fade show active" id="contacts" role="tabpanel">
+            {% if contacts %}
+                <ul class="list-group">
+                    {% for contact in contacts %}
+                        <li class="list-group-item">{{ contact.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="mt-3">You have no contacts; check back soon.</p>
+            {% endif %}
+        </div>
+        <div class="tab-pane fade" id="chats" role="tabpanel">
+            {% if chats %}
+                <ul class="list-group">
+                    {% for chat in chats %}
+                        <li class="list-group-item">
+                            <strong>{{ chat.title }}</strong>
+                            <p>{{ chat.preview }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="mt-3">You have no chats; message a contact to start a chat.</p>
+            {% endif %}
+        </div>
     </div>
-    <div id="chat" class="mt-4">
-        {% if chats %}
-            <ul>
-                {% for chat in chats %}
-                    <li>
-                        <strong>{{ chat.title }}</strong>
-                        <p>{{ chat.preview }}</p>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You have no chats; message a contact to start a chat.</p>
-        {% endif %}
-    </div>
-    <script>
-        // Get references to the tab links
-        const contactsTab = document.querySelector('[href="#contacts"]');
-        const chatsTab = document.querySelector('[href="#chats"]');
-    
-        // Get references to the tab content sections
-        const contactsSection = document.getElementById('contacts');
-        const chatsSection = document.getElementById('chat');
-    
-        // Hide the chats section initially
-        chatsSection.style.display = 'none';
-    
-        // Event listener for clicking the contacts tab
-        contactsTab.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default navigation behavior
-            contactsSection.style.display = 'block';
-            chatsSection.style.display = 'none';
-        });
-    
-        // Event listener for clicking the chats tab
-        chatsTab.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default navigation behavior
-            chatsSection.style.display = 'block';
-            contactsSection.style.display = 'none';
-        });
-    </script>
 </div>
 {% endblock %}

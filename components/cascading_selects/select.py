@@ -1,5 +1,6 @@
+# File: components/cascading_selects/select.py
+from typing import Any, Dict
 from django_components import component
-
 from .states import state_countries_dict
 
 @component.register("select_cascading_selects")
@@ -10,12 +11,17 @@ class SelectCascadingSelectsComponent(component.Component):
         {% endfor %}
     """
 
-    def get_context_data(self, country, *args, **kwargs):
-        states = state_countries_dict.get(country)
-        print(country)
-        return {'states' : state_countries_dict.get(country)}
+    
 
     def get(self, request, *args, **kwargs):
         country = request.GET.get("country")
-        states = state_countries_dict[country]
+        print("COUNTRY " + country)
+        if not country:
+            return self.render_to_response({"states": []})
+        states = state_countries_dict.get(country, [])
         return self.render_to_response({"states": states})
+        # country = request.GET.get("country")
+        # if not country:
+        #     raise ValueError("Country parameter is required for the request.")
+        # states = state_countries_dict
+        # return self.render_to_response({"states": states})

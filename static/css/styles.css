@@ -1,0 +1,117 @@
+:root {
+    --brand-green-seafoam: #BFE89F; /* Sage */
+    --brand-teal-ocean: #196E77;    /* Ocean Teal */
+    --brand-orange-salmon: #FF8653; /* Salmon */
+    --brand-purple-royal: #5C33C2;  /* Royal Purple */
+    --brand-blue-sky: #C0F1F7;      /* Sky */
+    --brand-pink-bubblegum: #FFABD6;/* Bubblegum */
+    --brand-yellow-sunflower: #FFD800; /* Sunflower */
+    --brand-black-charcoal: #282828;  /* Charcoal */
+    --brand-grey-air: #EAEAEA;      /* Air */
+    --brand-coral-soft: #F96744;    /* Soft Coral */
+    --brand-blue-pop: #00A2D0;      /* Pop Blue */
+    
+    /* Define your font */
+    --main-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Apply custom styles */
+body {
+    background-color: var(--brand-grey-air);
+    color: var(--brand-black-charcoal);
+    font-family: var(--main-font-family);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--brand-coral-soft);
+}
+
+a {
+    color: var(--brand-teal-ocean);
+}
+
+a:hover {
+    color: var(--brand-orange-salmon);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--brand-coral-soft);
+    border-color: var(--brand-coral-soft);
+    color: var(--brand-grey-air);
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-orange-salmon);
+    border-color: var(--brand-orange-salmon);
+}
+
+/* Additional customizations as needed */
+/* Hide the default checkbox */
+.custom-checkbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.custom-checkbox + .form-check-label {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+}
+
+/* Custom checkbox design */
+.custom-checkbox + .form-check-label:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #196E77; /* Custom border color */
+    border-radius: 3px; /* Square with slight rounding */
+    background-color: #fff;
+}
+
+/* On checkbox checked */
+.custom-checkbox:checked + .form-check-label:before {
+    background-color: #196E77; /* Checked background color */
+    border-color: #196E77;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.custom-checkbox:checked + .form-check-label:after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-navbar {
+    background-color: var(--brand-green-seafoam);
+}
+
+.custom-logout-button {
+    color: white;
+    background-color: var(--brand-coral-soft);
+    padding-right: 10px;
+    padding-left: 10px;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    /* padding: 0; */
+}
+
+.custom-logout-button:hover {
+    color: var(--brand-grey-air);
+    background-color: var(--brand-coral-soft);
+    padding-right: 10px;
+    padding-left: 10px;
+    text-decoration: none;
+}

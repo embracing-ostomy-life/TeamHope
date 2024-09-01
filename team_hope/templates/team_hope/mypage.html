@@ -1,4 +1,4 @@
-{% extends "team_hope/base.html" %}
+{% extends "base.html" %}
 {% load restaurant_extras %}
 {% block title %}Coming Soon.{% endblock %}
 {% block head %}
@@ -7,7 +7,7 @@
 {% block content %}
     {% component "form_inline_validation"%}
     {% endcomponent %}
-    <div class="flex items-baseline justify-center">
-      <button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900 border-1 border-zinc-600">Submit</button>
+    <div class="d-flex align-items-baseline justify-content-center">
+        <button class="btn btn-primary mt-4">Submit</button>
     </div>
 {% endblock content %}

@@ -1,34 +1,51 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     {% block head %}
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Chat - Team Hope - Embracing Ostomy Life</title>
-        <link rel="icon"href="{% static 'favicon.ico' %}">
-        <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.js" integrity="sha384-qbtR4rS9RrUMECUWDWM2+YGgN3U4V4ZncZ0BvUcg9FGct0jqXz3PUdVpU1p0yrXS" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="{% static 'src/output.css' %}">
-        <style>
-          body {
-              padding-top: 4.5rem;
-          }
-        </style>
-        {% if DEPLOYENV == 'prod' %}
-            <script defer src="{% static 'chat/cometchatwidget.js' %}"></script>
-        {% endif %}
-        {% if DEPLOYENV == 'test' %}
-            <script defer src="{% static 'testchat/cometchatwidget.js' %}"></script>
-        {% endif %}
-        {% if DEPLOYENV == 'local' %}
-            <script defer src="{% static 'localchat/cometchatwidget.js' %}"></script>
-        {% endif %}
+        <link rel="icon" href="{% static 'favicon.ico' %}">
+        <!-- Include Bootstrap CSS -->
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">   
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+        <script defer src="{% static 'chat/cometchatwidget.js' %}"></script>     
     {% endblock %}
 </head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    {% include 'team_hope/tailwind_nav.html' %}
-    <div id='mainwindow' class="flex justify-center m-4">
-            <div id="cometchat"></div>
-            <script>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light custom-navbar sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/home">
+                <img src="https://embracingostomylife.org/wp-content/uploads/graphics/teamhope-logo.png" alt="Team Hope Logo" class="img-fluid" style="height: 50px;">
+            </a>
+            <a class="navbar-brand" href="https://embracingostomylife.org">
+                <img src="{% static 'logo.png' %}" alt="Embracing Ostomy Life Logo" class="img-fluid" style="height: 50px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    {% if request.user.is_active and request.user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'admin:index' %}">Admin Panel</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <form id="logout-form" action="{% url 'azure_b2c_logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn custom-logout-button">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mainwindow" class="container-fluid mt-4">
+        <div id="cometchat" class="w-100"></div>
+        <script>
             window.addEventListener('DOMContentLoaded', (event) => {
                 CometChatWidget.init({
                     "appID": "{{ COMET_APP_ID }}",
@@ -36,31 +53,30 @@
                     "authKey": "{{ COMET_AUTH_KEY }}"
                 }).then(response => {
                     console.log("Initialization completed successfully");
-                    const windowHeight = window.innerHeight;
-                    const bodyWidth = document.body.offsetWidth;
-                    //You can now call login function.
+                    // Remove explicit height and width calculations
                     CometChatWidget.login({
                         "uid": '{{ UID }}'
                     }).then(response => {
                         CometChatWidget.launch({
-                            "widgetID": "27be47aa-57bb-4acd-a810-7523bea0aafa",
+                            "widgetID": "e86e67eb-f78c-4d97-8f81-1136dfaec6f4",
                             "target": "#cometchat",
                             "roundedCorners": "true",
-                            "height": `${windowHeight * .85}px`,
-                            "width": `${bodyWidth * .9}px`,
-                            "defaultID": '{{ UID }}', //default UID (user) or GUID (group) to show,
-                            "defaultType": 'user' //user or group
+                            "height": "100%",
+                            "width": "100%",
+                            "defaultID": '{{ UID }}',
+                            "defaultType": 'user'
                         });
                     }, error => {
                         console.log("User login failed with error:", error);
-                        //Check the reason for error and take appropriate action.
                     });
                 }, error => {
                     console.log("Initialization failed with error:", error);
-                    //Check the reason for error and take appropriate action.
                 });
             });
-            </script>
-      </div>
+        </script>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
