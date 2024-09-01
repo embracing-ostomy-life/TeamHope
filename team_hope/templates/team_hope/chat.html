@@ -13,38 +13,11 @@
         <script defer src="{% static 'chat/cometchatwidget.js' %}"></script>     
     {% endblock %}
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light custom-navbar sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/home">
-                <img src="https://embracingostomylife.org/wp-content/uploads/graphics/teamhope-logo.png" alt="Team Hope Logo" class="img-fluid" style="height: 50px;">
-            </a>
-            <a class="navbar-brand" href="https://embracingostomylife.org">
-                <img src="{% static 'logo.png' %}" alt="Embracing Ostomy Life Logo" class="img-fluid" style="height: 50px;">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
-                    {% if request.user.is_active and request.user.is_staff %}
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'admin:index' %}">Admin Panel</a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <form id="logout-form" action="{% url 'azure_b2c_logout' %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn custom-logout-button">Logout</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div id="mainwindow" class="container-fluid mt-4">
-        <div id="cometchat" class="w-100"></div>
+<body>  <!-- Adding padding to the top to offset the navbar height -->
+    {% include 'team_hope/bootstrap_nav.html' %}
+    
+    <div id="mainwindow" class="d-flex justify-content-center m-4">
+        <div id="cometchat"></div>
         <script>
             window.addEventListener('DOMContentLoaded', (event) => {
                 CometChatWidget.init({
@@ -53,7 +26,9 @@
                     "authKey": "{{ COMET_AUTH_KEY }}"
                 }).then(response => {
                     console.log("Initialization completed successfully");
-                    // Remove explicit height and width calculations
+                    const windowHeight = window.innerHeight;
+                    const bodyWidth = document.body.offsetWidth;
+                    //You can now call login function.
                     CometChatWidget.login({
                         "uid": '{{ UID }}'
                     }).then(response => {
@@ -61,16 +36,18 @@
                             "widgetID": "e86e67eb-f78c-4d97-8f81-1136dfaec6f4",
                             "target": "#cometchat",
                             "roundedCorners": "true",
-                            "height": "100%",
-                            "width": "100%",
-                            "defaultID": '{{ UID }}',
-                            "defaultType": 'user'
+                            "height": `${windowHeight * 0.85}px`,
+                            "width": `${bodyWidth * 0.9}px`,
+                            "defaultID": '{{ UID }}', //default UID (user) or GUID (group) to show,
+                            "defaultType": 'user' //user or group
                         });
                     }, error => {
                         console.log("User login failed with error:", error);
+                        //Check the reason for error and take appropriate action.
                     });
                 }, error => {
                     console.log("Initialization failed with error:", error);
+                    //Check the reason for error and take appropriate action.
                 });
             });
         </script>
