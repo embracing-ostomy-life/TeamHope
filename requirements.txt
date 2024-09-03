@@ -13,5 +13,6 @@ requests==2.32.2
 cryptography==42.0.7
 pytailwindcss==0.2.0
 django-compressor==4.4
-
+Pillow == 10.4.0
 certifi==2024.2.2
+sendgrid == 6.11.0

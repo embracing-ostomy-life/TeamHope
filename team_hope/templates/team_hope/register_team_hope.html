@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load form_tags %}
+
+{% block header %}Register for Team Hope{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Register for Team Hope</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Country and State -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {% component 'parent_select_cascading_selects' %}
+                {% endcomponent %}
+            </div>
+        </div>
+
+        <!-- Profile Picture -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="profile_picture" class="form-label">Profile Picture</label>
+                <div class="d-flex flex-column align-items-center">
+                    <img id="profile-picture-preview" src="#" alt="Profile Picture Preview" class="img-fluid mb-2" style="max-width: 150px; display: none;">
+                    <input type="file" name="profile_picture" id="profile_picture" class="form-control" onchange="previewImage(event)" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Surgery Date and Type -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.surgery_date.label_tag }}
+                {{ form.surgery_date|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                {{ form.surgery_type.label_tag }}
+                {{ form.surgery_type|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Surgeon and Hospital -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.surgeon_name.label_tag }}
+                {{ form.surgeon_name|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                {{ form.hospital_name.label_tag }}
+                {{ form.hospital_name|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Age, Gender, Relationship Status, Language -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                {{ form.age.label_tag }}
+                {{ form.age|add_class:"form-control" }}
+            </div>
+            <div class="col-md-3">
+                {{ form.gender.label_tag }}
+                {{ form.gender|add_class:"form-control" }}
+            </div>
+            <div class="col-md-6">
+                {{ form.relationship_status.label_tag }}
+                {{ form.relationship_status|add_class:"form-control" }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                {{ form.ethnicity.label_tag }}
+                {{ form.ethnicity|add_class:"form-control" }}
+            </div>
+            <div class="col-md-4">
+                {{ form.primary_language.label_tag }}
+                {{ form.primary_language|add_class:"form-control" }}
+            </div>
+            <div class="col-md-4">
+                {{ form.secondary_language.label_tag }}
+                {{ form.secondary_language|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Hobbies and Bio -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.hobbies.label_tag }}
+                {{ form.hobbies|add_class:"form-control textarea-short" }}
+            </div>
+            <div class="col-md-6">
+                {{ form.bio.label_tag }}
+                {{ form.bio|add_class:"form-control textarea-short" }}
+            </div>
+        </div>
+
+        <!-- Certify and Submit -->
+        <!-- Certify and Submit -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="form-check">
+                    {{ form.certify|add_class:"form-check-input" }}
+                    <label class="form-check-label" for="{{ form.certify.id_for_label }}">I agree to the terms and conditions</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-lg btn-primary">Register</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            var output = document.getElementById('profile-picture-preview');
+            output.src = reader.result;
+            output.style.display = 'block';
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock content %}

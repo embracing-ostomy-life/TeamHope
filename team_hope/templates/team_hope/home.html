@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load restaurant_extras %}
 {% block title %}Home{% endblock %}
 {% block head %}
     {{ block.super }}
@@ -9,21 +8,44 @@
         <div class="d-flex align-items-baseline justify-content-center">
             <h3 class="text-center fw-bold">Welcome, {{ user.get_full_name }}</h3>
         </div>
-        <div button hx-get="/register/user_type" hx-target="#get-target" class="d-flex align-items-baseline justify-content-center">
-            {% if not user_profile_is_complete %}
-            <button class="btn btn-primary mt-4">Complete your profile.</button>
-            {% else %}
-            <button class="btn btn-primary mt-4">Profile Complete! Redo?</button>
-            {% endif %}
-        </div>
+
+        <!-- Team Hope Registration or Chat -->
         <div class="d-flex align-items-baseline justify-content-center">
-            {% if not chat_enabled %}
-            <button class="btn btn-primary mt-4" disabled>Team Hope Chat (coming soon)</button>
+            {% if user_profile.team_hope_all_complete %}
+                <a href="/chat">
+                    <button class="btn btn-primary mt-4">Go to Team Hope Chat</button>
+                </a>
             {% else %}
-            <a href="/chat">
-                <button class="btn btn-primary mt-4">Team Hope Chat</button>
-            </a>
+                <a href="/register/team_hope">
+                    <button class="btn btn-primary mt-4">Register for Team Hope</button>
+                </a>
             {% endif %}
         </div>
+
+        <!-- Alive and Kicking Registration or Unsubscribe -->
+        <div class="d-flex align-items-baseline justify-content-center">
+            {% if user_profile.subscribed_to_aliveandkicking %}
+                <a href="/unsubscribe/alive_and_kicking">
+                    <button class="btn btn-danger mt-4">Unsubscribe from Alive and Kicking</button>
+                </a>
+            {% else %}
+                <a href="/register/alive_and_kicking">
+                    <button class="btn btn-primary mt-4">Register for Alive and Kicking</button>
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Profile Completion -->
+        <div id="get-target">
+            <div class="d-flex align-items-baseline justify-content-center">
+                {% if not user_profile_is_complete %}
+                    <button hx-get="/register/user_type" hx-target="#get-target" class="btn btn-warning mt-4">Complete your profile.</button>
+                {% else %}
+                    <button hx-get="/register/user_type" hx-target="#get-target" class="btn btn-success mt-4">Profile Complete! Redo?</button>
+                {% endif %}
+            </div>
+        </div>
+        
+        
     </div>
 {% endblock content %}

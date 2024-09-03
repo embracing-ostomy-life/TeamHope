@@ -153,25 +153,34 @@ WSGI_APPLICATION = 'embracing_ostomy_life.wsgi.application'
 
 # Configure Postgres database for local development
 #   Set these environment variables in the .env file for this project.
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DBNAME'),
-#         'HOST': os.environ.get('DBHOST'),
-#         'USER': os.environ.get('DBUSER'),
-#         'PASSWORD': os.environ.get('DBPASS'),
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',#os.environ.get('DBNAME'),
-        'HOST': 'localhost',#os.environ.get('DBHOST'),
-        'PORT': '5431',#os.environ.get('DBPORT'),
-        'USER': 'postgres',#os.environ.get('DBUSER'),
-        'PASSWORD': 'TeamHope1',#os.environ.get('DBPASS'),
+        'NAME': os.environ.get('DBNAME'),
+        'HOST': os.environ.get('DBHOST'),
+        'USER': os.environ.get('DBUSER'),
+        'PASSWORD': os.environ.get('DBPASS'),
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',#os.environ.get('DBNAME'),
+#         'HOST': 'localhost',#os.environ.get('DBHOST'),
+#         'PORT': '5431',#os.environ.get('DBPORT'),
+#         'USER': 'postgres',#os.environ.get('DBUSER'),
+#         'PASSWORD': 'TeamHope1',#os.environ.get('DBPASS'),
+#     }
+# }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'apikey')
+EMAIL_HOST_PASSWORD = os.getenv('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = os.getenv('EmbracingOstomyLife <contact@embracingostomylife.org>')
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

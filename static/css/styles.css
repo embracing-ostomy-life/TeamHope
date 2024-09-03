@@ -13,9 +13,11 @@
     
     /* Define your font */
     --main-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --form-header-font: 'Segoe UI Bold', sans-serif;
+    --form-field-font: 'Segoe UI SemiBold', sans-serif;
 }
 
-/* Apply custom styles */
+/* Base Styles */
 body {
     background-color: var(--brand-grey-air);
     color: var(--brand-black-charcoal);
@@ -34,11 +36,49 @@ a:hover {
     color: var(--brand-orange-salmon);
 }
 
+.label{
+    font-family: var(--form-header-font);
+    font-size: 1.5rem;
+    color: var(--brand-black-charcoal);
+    padding-right: 10px;
+}
+label{
+    font-family: var(--form-header-font);
+    font-size: 1.5rem;
+    color: var(--brand-black-charcoal);
+    padding-right: 10px;
+}
+
+/* Navbar */
+.custom-navbar {
+    background-color: var(--brand-green-seafoam);
+}
+
+/* Logout Button */
+.custom-logout-button {
+    color: white;
+    background-color: var(--brand-coral-soft);
+    padding: 12px 24px;
+    font-size: 18px;
+    border-color: var(--brand-coral-soft);
+    cursor: pointer;
+}
+
+
+
+.custom-logout-button:hover {
+    background-color: var(--brand-orange-salmon);
+    border-color: var(--brand-orange-salmon);
+}
+
 /* Buttons */
 .btn-primary {
     background-color: var(--brand-coral-soft);
     border-color: var(--brand-coral-soft);
     color: var(--brand-grey-air);
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 5px;
 }
 
 .btn-primary:hover {
@@ -46,22 +86,93 @@ a:hover {
     border-color: var(--brand-orange-salmon);
 }
 
-/* Additional customizations as needed */
-/* Hide the default checkbox */
+/* Form Styles */
+.form-control {
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--brand-teal-ocean);
+}
+
+
+.form-label {
+    font-family: var(--form-header-font);
+    font-size: 1.5rem;
+    color: var(--brand-black-charcoal);
+}
+
+.form-control {
+    font-family: var(--form-field-font);
+    font-size: 1rem;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+form .row > .col-md-6, form .row > .col-md-12 {
+    margin-bottom: 10px;
+}
+
+.container h2 {
+    color: var(--brand-coral-soft);
+    margin-bottom: 30px;
+}
+
+/* Custom Date Picker Styles */
+input[type="date"] {
+    appearance: none;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+input[type="date"]:focus {
+    outline: none;
+    border-color: var(--brand-teal-ocean);
+}
+
+/* Improved Checkbox Appearance */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+}
+
+.form-check-label {
+    margin-left: 8px;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.textarea-short {
+    height: 100px; /* Adjust this value to control the height */
+    resize: vertical; /* Allow users to resize vertically */
+}
+
+/* Custom Checkbox Design */
 .custom-checkbox {
     position: absolute;
     opacity: 0;
     cursor: pointer;
 }
 
-/* Create a custom checkbox */
 .custom-checkbox + .form-check-label {
     position: relative;
     padding-left: 30px;
     cursor: pointer;
 }
 
-/* Custom checkbox design */
 .custom-checkbox + .form-check-label:before {
     content: "";
     position: absolute;
@@ -69,18 +180,16 @@ a:hover {
     top: 0;
     width: 20px;
     height: 20px;
-    border: 2px solid #196E77; /* Custom border color */
-    border-radius: 3px; /* Square with slight rounding */
+    border: 2px solid var(--brand-teal-ocean);
+    border-radius: 3px;
     background-color: #fff;
 }
 
-/* On checkbox checked */
 .custom-checkbox:checked + .form-check-label:before {
-    background-color: #196E77; /* Checked background color */
-    border-color: #196E77;
+    background-color: var(--brand-teal-ocean);
+    border-color: var(--brand-teal-ocean);
 }
 
-/* Create the checkmark/indicator (hidden when not checked) */
 .custom-checkbox:checked + .form-check-label:after {
     content: "";
     position: absolute;
@@ -93,25 +202,30 @@ a:hover {
     transform: rotate(45deg);
 }
 
-.custom-navbar {
-    background-color: var(--brand-green-seafoam);
+/* Profile Picture Container */
+.profile-picture-container {
+    display: flex;
+    align-items: center;
 }
 
-.custom-logout-button {
-    color: white;
-    background-color: var(--brand-coral-soft);
-    padding-right: 10px;
-    padding-left: 10px;
-    border: none;
-    text-decoration: underline;
-    cursor: pointer;
-    /* padding: 0; */
+.profile-picture-container input[type="file"] {
+    flex: 1;
 }
 
-.custom-logout-button:hover {
-    color: var(--brand-grey-air);
-    background-color: var(--brand-coral-soft);
+#profile-picture-preview {
+    max-width: 150px;
+    display: block;
+    margin-left: 20px;
+}
+
+/* Adjusted column widths for smaller form elements */
+.row .col-md-3 {
     padding-right: 10px;
     padding-left: 10px;
-    text-decoration: none;
+}
+
+/* Hobbies and Bio Styling */
+.hobbies-and-bio .col-md-6 {
+    padding-right: 10px;
+    padding-left: 10px;
 }
