@@ -40,9 +40,13 @@ AZURE_B2C_TENANT = os.getenv('AZURE_B2C_TENANT')
 AZURE_B2C_DOMAIN = os.getenv('AZURE_B2C_DOMAIN')
 AZURE_B2C_POLICY_NAME = os.getenv('AZURE_B2C_POLICY_NAME')
 AZURE_B2C_REDIRECT_URI = os.getenv('AZURE_B2C_REDIRECT_URI')
+AZURE_POST_LOGOUT_REDIRECT_URI = os.getenv('APP_URL') +'/logout/complete/'
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+SENDGRID_ALIVE_AND_KICKING_ID = os.getenv('SENDGRID_ALIVE_AND_KICKING_ID')
+
 
 AZURE_B2C_AUTH_URL = f'https://{AZURE_B2C_TENANT}.b2clogin.com/{AZURE_B2C_TENANT}.onmicrosoft.com/oauth2/v2.0/authorize?p={AZURE_B2C_POLICY_NAME}&client_id={AZURE_B2C_CLIENT_ID}&response_type=id_token&redirect_uri={{redirect_uri}}&response_mode=query&scope=openid%20profile%20email&state=12345'
-AZURE_B2C_LOGOUT_URL = f'https://{AZURE_B2C_TENANT}.b2clogin.com/{AZURE_B2C_TENANT}.onmicrosoft.com/oauth2/v2.0/logout?p={AZURE_B2C_POLICY_NAME}&post_logout_redirect_uri={AZURE_B2C_REDIRECT_URI}'
+AZURE_B2C_LOGOUT_URL = f'https://{AZURE_B2C_TENANT}.b2clogin.com/{AZURE_B2C_TENANT}.onmicrosoft.com/oauth2/v2.0/logout?p={AZURE_B2C_POLICY_NAME}&post_logout_redirect_uri={AZURE_POST_LOGOUT_REDIRECT_URI}'
 
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"

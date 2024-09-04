@@ -235,7 +235,10 @@ def register_alive_and_kicking(request):
             # Schedule SendGrid subscription or other post-processing
             subscription_success = schedule_sendgrid_subscription(current_user.email, profile.surgery_date)
             if not subscription_success:
+                #pring diagnostic message and details
+
                 return HttpResponse("Failed to subscribe user to the email list.", status=500)
+            
 
             return redirect('home')
     else:
