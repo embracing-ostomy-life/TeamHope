@@ -18,7 +18,7 @@
         </li>
         {% endif %}
         <li class="nav-item">
-          <form id="logout-form" action="{% url 'azure_b2c_logout' %}" method="post">
+          <form id="logout-form" action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn nav-link custom-logout-button">Logout</button>
           </form>

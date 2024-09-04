@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.conf import settings
 from . import views 
 from .views import azure_b2c_login, azure_b2c_callback, home
-from .views import user_type, register_type, register_confirm, register_location, register_journey, register_team_hope, register_alive_and_kicking, ProfilePictureUpdateView
+from .views import user_type, register_type, register_confirm, register_location, register_journey, register_team_hope, register_alive_and_kicking, ProfilePictureUpdateView, logout_view, logout_complete_view
 from .views import chat, CustomLogoutView
 
 
@@ -44,5 +44,9 @@ urlpatterns = [
     path('profile/edit/', ProfileUpdateView.as_view(), name='profile_edit'),
     path('profile/picture/', ProfilePictureUpdateView.as_view(), name='profile_picture_edit'),
     
-    path('logout/', CustomLogoutView.as_view(), name='logout')
+    #path('logout/', CustomLogoutView.as_view(), name='logout')
+    path('logout/', logout_view, name='logout'),
+    path('logout/complete/', logout_complete_view, name='logout_complete'),
+
+
 ]

@@ -10,13 +10,19 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from datetime import datetime
 import jwt
+import time
 from jwt import PyJWKClient
 from .forms import RegisterForm, ProfileForm, ProfilePictureForm, RegisterTeamHopeForm
 from .models import UserProfile, UserIdentityInfo, UserType
 from .cometchat import CCUser
 from .utils import sendgrid_unsubscribe_user, user_profile_is_complete, validate_age
 from components.cascading_selects.states import state_countries_dict
-
+from django.shortcuts import redirect
+from django.conf import settings
+from django.contrib.auth import logout
+from django.contrib.auth import logout as django_logout
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 
 def azure_b2c_login(request):
@@ -94,6 +100,19 @@ class ProfilePictureUpdateView(LoginRequiredMixin, UpdateView):
 class CustomLogoutView(LogoutView):
     template_name = 'registration/logged_out.html'
 
+
+
+def logout_view(request):
+    django_logout(request)  # Clears the session
+    logout_url = settings.AZURE_B2C_LOGOUT_URL
+    return redirect(logout_url)
+
+def logout_complete_view(request):
+    # You can render a custom logout complete template or redirect to the home page
+    return render(request, 'team_hope/logout_complete.html')
+
+
+
 def home(request):
     if not request.user.is_authenticated:
         return redirect('azure_b2c_login')
@@ -169,6 +188,36 @@ def register_team_hope(request):
 
     return render(request, 'team_hope/register_team_hope.html', {'form': form})
 
+def schedule_sendgrid_subscription(email, surgery_date):
+    try:
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+
+        # Determine the send_at timestamp
+        if surgery_date and surgery_date > datetime.date.today():
+            send_at = int(time.mktime(surgery_date.timetuple()))  # Schedule for the surgery date
+        else:
+            send_at = int(time.time())  # Send immediately
+
+        # Create the email
+        message = Mail(
+            from_email='sender@example.com',  # Ensure this email is verified in SendGrid
+            to_emails=email,
+            subject='Alive and Kicking - Post Surgery Support',
+            html_content='<strong>Your post-surgery support emails will start soon.</strong>'
+        )
+
+        # Set the send_at parameter for scheduling
+        message.send_at = send_at
+
+        # Send the email
+        response = sg.send(message)
+
+        return response.status_code in [200, 202]
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Log the error for debugging
+        return False
+
+
 def register_alive_and_kicking(request):
     if not request.user.is_authenticated:
         return redirect(azure_b2c_login)
@@ -184,11 +233,18 @@ def register_alive_and_kicking(request):
             if not profile.surgery_date:
                 profile.surgery_date = form.cleaned_data.get('surgery_date')
             profile.save()
+
+            # Subscribe the user to the SendGrid email with the calculated delay based on surgery date
+            subscription_success = schedule_sendgrid_subscription(current_user.email, profile.surgery_date)
+            if not subscription_success:
+                return HttpResponse("Failed to subscribe user to the email list.", status=500)
+
             return redirect('home')
     else:
         form = RegisterForm(instance=profile)
 
     return render(request, 'team_hope/register_alive_and_kicking.html', {'form': form})
+
 
 def unsubscribe_alive_and_kicking(request):
     if not request.user.is_authenticated:
