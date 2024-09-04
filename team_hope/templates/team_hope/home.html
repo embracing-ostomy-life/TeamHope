@@ -11,20 +11,18 @@
 
         <!-- Team Hope Registration or Chat -->
         <div class="d-flex align-items-baseline justify-content-center">
-            {% if user_profile.team_hope_all_complete %}
-                <a href="/chat">
-                    <button class="btn btn-primary mt-4">Go to Team Hope Chat</button>
-                </a>
-            {% else %}
+           <!-- # {% if team_hope_complete %} -->
+                
+            <!-- {% else %} -->
                 <a href="/register/team_hope">
                     <button class="btn btn-primary mt-4">Register for Team Hope</button>
                 </a>
-            {% endif %}
+            <!-- {% endif %} -->
         </div>
 
         <!-- Alive and Kicking Registration or Unsubscribe -->
         <div class="d-flex align-items-baseline justify-content-center">
-            {% if user_profile.subscribed_to_aliveandkicking %}
+            {% if alive_and_kicking_subscribed %}
                 <a href="/unsubscribe/alive_and_kicking">
                     <button class="btn btn-danger mt-4">Unsubscribe from Alive and Kicking</button>
                 </a>
@@ -38,11 +36,14 @@
         <!-- Profile Completion -->
         <div id="get-target">
             <div class="d-flex align-items-baseline justify-content-center">
-                {% if not user_profile_is_complete %}
+                <a href="/chat">
+                    <button class="btn btn-primary mt-4">Go to Team Hope Chat</button>
+                </a>
+                <!-- {% if not user_profile_is_complete %}
                     <button hx-get="/register/user_type" hx-target="#get-target" class="btn btn-warning mt-4">Complete your profile.</button>
                 {% else %}
                     <button hx-get="/register/user_type" hx-target="#get-target" class="btn btn-success mt-4">Profile Complete! Redo?</button>
-                {% endif %}
+                {% endif %} -->
             </div>
         </div>
         

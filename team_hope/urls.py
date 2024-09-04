@@ -47,6 +47,7 @@ urlpatterns = [
     #path('logout/', CustomLogoutView.as_view(), name='logout')
     path('logout/', logout_view, name='logout'),
     path('logout/complete/', logout_complete_view, name='logout_complete'),
+    path('unsubscribe/alive_and_kicking', views.unsubscribe_alive_and_kicking, name='unsubscribe_alive_and_kicking'),  # Add this line
 
 
 ]

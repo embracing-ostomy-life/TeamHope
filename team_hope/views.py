@@ -118,13 +118,15 @@ def home(request):
         return redirect('azure_b2c_login')
 
     current_user = request.user
+    profile = UserProfile.objects.get(user=current_user)
     is_profile_complete = user_profile_is_complete(current_user)
 
+    # Directly use the team_hope_all_complete and subscribed_to_aliveandkicking fields
     if request.method == 'POST':
         form = RegisterForm(request.POST, instance=current_user.userprofile)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.registration_complete = True  # Mark as registered if applicable
+            profile.registration_complete = True
             profile.save()
 
             try:
@@ -139,9 +141,12 @@ def home(request):
     params = {
         'chat_enabled': is_profile_complete,
         'user_profile_is_complete': is_profile_complete,
-        'form': form
+        'form': form,
+        'team_hope_complete': profile.team_hope_all_complete,  # Using team_hope_all_complete directly from profile
+        'alive_and_kicking_subscribed': profile.subscribed_to_aliveandkicking,  # Using subscribed_to_aliveandkicking directly from profile
     }
     return render(request, 'team_hope/home.html', params)
+
 
 def index(request):
     if request.user.is_authenticated:
@@ -180,6 +185,9 @@ def register_team_hope(request):
         form = RegisterTeamHopeForm(request.POST, instance=profile)
         if form.is_valid():
             profile = form.save(commit=False)
+            
+            profile.team_hope_docusign_complete = True
+            profile.team_hope_training_complete = True
             profile.team_hope_all_complete = True
             profile.save()
             return redirect('home')
@@ -318,7 +326,7 @@ def register_confirm(request):
     return render(request, 'team_hope/registration/confirm.html')
 
 def chat(request):
-    if not request.user.is_authenticated or not user_profile_is_complete(request.user):
+    if not request.user.is_authenticated: #or not user_profile_is_complete(request.user):
         return redirect('home')
 
     current_user = request.user
