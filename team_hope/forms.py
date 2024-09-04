@@ -1,8 +1,7 @@
 from django import forms
 from .models import UserProfile, UserType, OstomateType, RelationshipStatus
 from django import forms
-
-
+import datetime
 class RegisterForm(forms.ModelForm):
     certify = forms.BooleanField(
         required=True,
@@ -115,3 +114,40 @@ class ProfilePictureForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['profile_picture']  # Ensure this field is correct
+
+
+
+class RegisterAliveAndKickingForm(forms.ModelForm):
+    certify = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(),
+        label="I agree to the terms and conditions"
+    )
+
+    surgery_date = forms.DateField(
+        required=True,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        initial=datetime.date.today  # Set initial value to today's date
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = ['surgery_date', 'certify']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only set the initial value if surgery_date is not already set
+        if not self.instance.surgery_date:
+            self.fields['surgery_date'].initial = datetime.date.today()
+
+    def clean_surgery_date(self):
+        surgery_date = self.cleaned_data.get('surgery_date')
+        if not surgery_date:
+            raise forms.ValidationError("The surgery date is required.")
+        return surgery_date
+
+    def clean_certify(self):
+        certify = self.cleaned_data.get('certify')
+        if not certify:
+            raise forms.ValidationError("You must agree to the terms and conditions to proceed.")
+        return certify

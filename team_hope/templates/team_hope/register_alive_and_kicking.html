@@ -5,8 +5,62 @@
     <h2>Register for Alive and Kicking</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <div class="form-group row">
+            <!-- Surgery Date -->
+            <div class="col-md-6">
+                <label for="id_surgery_date">Surgery date:</label>
+                {{ form.surgery_date }}
+                {% if form.surgery_date.errors %}
+                    <div class="text-danger">
+                        {{ form.surgery_date.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Days till Surgery Label -->
+            <div class="col-md-6">
+                <label for="days_till_surgery_label">Days till Surgery:</label>
+                <span id="days_till_surgery_label" class="form-control-plaintext"></span>
+            </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="form-group mt-3">
+            {{ form.certify }}
+            {{ form.certify.label_tag }}
+            {% if form.certify.errors %}
+                <div class="text-danger">
+                    {{ form.certify.errors }}
+                </div>
+            {% endif %}
+        </div>
+
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
 </div>
+
+<script>
+    // Function to calculate days till surgery
+    function calculateDaysTillSurgery() {
+        const surgeryDateInput = document.getElementById("id_surgery_date").value;
+        const daysTillSurgeryLabel = document.getElementById("days_till_surgery_label");
+
+        if (surgeryDateInput) {
+            const surgeryDate = new Date(surgeryDateInput);
+            const today = new Date();
+            const timeDiff = surgeryDate.getTime() - today.getTime();
+            const daysTillSurgery = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            daysTillSurgeryLabel.textContent = daysTillSurgery >= 0 ? daysTillSurgery +1 : 0;
+        } else {
+            daysTillSurgeryLabel.textContent = "No surgery date set";
+        }
+    }
+
+    // Calculate on initial page load
+    calculateDaysTillSurgery();
+
+    // Calculate whenever surgery date is changed
+    document.getElementById("id_surgery_date").addEventListener("change", calculateDaysTillSurgery);
+</script>
 {% endblock content %}

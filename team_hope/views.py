@@ -12,7 +12,7 @@ from datetime import datetime
 import jwt
 import time
 from jwt import PyJWKClient
-from .forms import RegisterForm, ProfileForm, ProfilePictureForm, RegisterTeamHopeForm
+from .forms import RegisterAliveAndKickingForm, RegisterForm, ProfileForm, ProfilePictureForm, RegisterTeamHopeForm
 from .models import UserProfile, UserIdentityInfo, UserType
 from .cometchat import CCUser
 from .utils import sendgrid_unsubscribe_user, user_profile_is_complete, validate_age
@@ -193,14 +193,14 @@ def schedule_sendgrid_subscription(email, surgery_date):
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
 
         # Determine the send_at timestamp
-        if surgery_date and surgery_date > datetime.date.today():
+        if surgery_date and surgery_date > datetime.now().date():
             send_at = int(time.mktime(surgery_date.timetuple()))  # Schedule for the surgery date
         else:
             send_at = int(time.time())  # Send immediately
 
         # Create the email
         message = Mail(
-            from_email='sender@example.com',  # Ensure this email is verified in SendGrid
+            from_email='rolf@embracingostomylife.org',  # Ensure this email is verified in SendGrid
             to_emails=email,
             subject='Alive and Kicking - Post Surgery Support',
             html_content='<strong>Your post-surgery support emails will start soon.</strong>'
@@ -220,30 +220,29 @@ def schedule_sendgrid_subscription(email, surgery_date):
 
 def register_alive_and_kicking(request):
     if not request.user.is_authenticated:
-        return redirect(azure_b2c_login)
+        return redirect('azure_b2c_login')
 
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
 
     if request.method == 'POST':
-        form = RegisterForm(request.POST, instance=profile)
+        form = RegisterAliveAndKickingForm(request.POST, instance=profile)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.subscribed_to_aliveandkicking = True
-            if not profile.surgery_date:
-                profile.surgery_date = form.cleaned_data.get('surgery_date')
+            profile.subscribed_to_aliveandkicking = True  # Set this programmatically
             profile.save()
 
-            # Subscribe the user to the SendGrid email with the calculated delay based on surgery date
+            # Schedule SendGrid subscription or other post-processing
             subscription_success = schedule_sendgrid_subscription(current_user.email, profile.surgery_date)
             if not subscription_success:
                 return HttpResponse("Failed to subscribe user to the email list.", status=500)
 
             return redirect('home')
     else:
-        form = RegisterForm(instance=profile)
+        form = RegisterAliveAndKickingForm(instance=profile)
 
     return render(request, 'team_hope/register_alive_and_kicking.html', {'form': form})
+
 
 
 def unsubscribe_alive_and_kicking(request):
