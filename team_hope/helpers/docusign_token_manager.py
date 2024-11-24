@@ -48,6 +48,18 @@ i4Zr7puY8XWtB63g3131KwVsMn8BUDgvb/qyfcD1/W8G8OcWduuW
 -----END RSA PRIVATE KEY-----
 """
 
+    _public_key = """
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApUL/jzWLLNzrbkRivz/w
+BU5Qw6zWsJ31aowYWOrMz9kRJQaFXbm6txUKxEjQRWXlX8AD71y4b/x9/qJORlsU
+2K6DHIUqb/6cRsoiQ06eV+7xzvOv5dK3LvTu3MKMEmzBNTyPgr1ndIzjQ3AcW6WL
+tGOtN54VsRGGlYtcxn0hWodmbPXZOVDodbc6b7O2Opj+3IkJ7TT07ENgZ0u/ioTB
+QVNnktYTmzbYe07DvIFvDpOlzIXxXb2lTB0IV6xR9Kmk16tJatHBNNWN5krekR7A
+6VRMxFa3K2W8EHnBtvZXpl6dxX4I3B+epONhdxKsGBSiWbBfdwpuNd7VpTee6um/
+PwIDAQAB
+-----END PUBLIC KEY----
+"""
+
     def __new__(cls, *args, **kwargs):
         """Singleton implementation to ensure only one instance."""
         if not cls._instance:

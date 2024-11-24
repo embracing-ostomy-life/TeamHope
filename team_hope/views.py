@@ -161,14 +161,6 @@ def docusign_webhook(request):
     """
     Handle DocuSign Connect webhook POST requests.
     """
-    current_user = request.user
-    profile = UserProfile.objects.get(user=current_user)
-    profile.aliveandkicking_waiver_complete = True
-    profile.subscribed_to_aliveandkicking = False
-    profile.save()
-    print(profile)
-    exit
-
     docusign_webhook_secret = settings.DS_CALLBACK_SECRET
     if request.method != "POST":
         return HttpResponseBadRequest("Invalid request method")
@@ -219,11 +211,6 @@ def home(request):
     profile = UserProfile.objects.get(user=current_user)
     is_profile_complete = user_profile_is_complete(current_user)
 
-    # print(profile.docusign_aliveandkicking_envelope_id)
-    # profile.subscribed_to_aliveandkicking = True
-    # profile.save()
-    # Directly use the team_hope_all_complete and
-    # subscribed_to_aliveandkicking fields
     if request.method == "POST":
         form = RegisterForm(request.POST, instance=current_user.userprofile)
         if form.is_valid():
