@@ -16,6 +16,13 @@ CSRF_TRUSTED_ORIGINS = (
     if "WEBSITE_HOSTNAME" in os.environ
     else []
 )
+
+if "WEBSITE_HOSNAME_NATIVE" in os.environ:
+    ALLOWED_HOSTS.append(os.environ["WEBSITE_HOSNAME_NATIVE"])
+
+if "WEBSITE_HOSNAME_NATIVE" in os.environ:
+    CSRF_TRUSTED_ORIGINS.append("https://" + os.environ["WEBSITE_HOSNAME_NATIVE"])
+
 DEBUG = True
 
 SECURE_SSL_REDIRECT = True
