@@ -1,52 +1,56 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block head %}
-    {{ block.super }}
+{{ block.super }}
 {% endblock %}
 {% block content %}
+<div id="get-target">
+    <div class="d-flex align-items-baseline justify-content-center">
+        <h3 class="text-center fw-bold">Welcome, {{ user.get_full_name }}</h3>
+    </div>
+    <div class="d-flex align-items-baseline justify-content-center">
+        {% if a_k_docusign_waiting %}
+        <h4>Your subscription to Alive & Kicking will be processed after you sign the document.</h4>
+        {% endif %}
+    </div>
+    <!-- Team Hope Registration or Chat -->
+    <div class="d-flex align-items-baseline justify-content-center">
+        <!-- # {% if team_hope_complete %} -->
+
+        <!-- {% else %} -->
+        <a href="/register/team_hope">
+            <button class="btn btn-primary mt-4">Register for Team Hope</button>
+        </a>
+        <!-- {% endif %} -->
+    </div>
+
+    <!-- Alive & Kicking Registration or Unsubscribe -->
+    <div class="d-flex align-items-baseline justify-content-center">
+        {% if alive_and_kicking_subscribed %}
+        <a href="/unsubscribe/alive_and_kicking">
+            <button class="btn btn-danger mt-4">Unsubscribe from Alive & Kicking</button>
+        </a>
+        {% else %}
+        <a href="/register/alive_and_kicking">
+            <button class="btn btn-primary mt-4">Register for Alive & Kicking</button>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Profile Completion -->
     <div id="get-target">
         <div class="d-flex align-items-baseline justify-content-center">
-            <h3 class="text-center fw-bold">Welcome, {{ user.get_full_name }}</h3>
-        </div>
-
-        <!-- Team Hope Registration or Chat -->
-        <div class="d-flex align-items-baseline justify-content-center">
-           <!-- # {% if team_hope_complete %} -->
-                
-            <!-- {% else %} -->
-                <a href="/register/team_hope">
-                    <button class="btn btn-primary mt-4">Register for Team Hope</button>
-                </a>
-            <!-- {% endif %} -->
-        </div>
-
-        <!-- Alive and Kicking Registration or Unsubscribe -->
-        <div class="d-flex align-items-baseline justify-content-center">
-            {% if alive_and_kicking_subscribed %}
-                <a href="/unsubscribe/alive_and_kicking">
-                    <button class="btn btn-danger mt-4">Unsubscribe from Alive and Kicking</button>
-                </a>
-            {% else %}
-                <a href="/register/alive_and_kicking">
-                    <button class="btn btn-primary mt-4">Register for Alive and Kicking</button>
-                </a>
-            {% endif %}
-        </div>
-
-        <!-- Profile Completion -->
-        <div id="get-target">
-            <div class="d-flex align-items-baseline justify-content-center">
-                <a href="/chat">
-                    <button class="btn btn-primary mt-4">Go to Team Hope Chat</button>
-                </a>
-                <!-- {% if not user_profile_is_complete %}
+            <a href="/chat">
+                <button class="btn btn-primary mt-4">Go to Team Hope Chat</button>
+            </a>
+            <!-- {% if not user_profile_is_complete %}
                     <button hx-get="/register/user_type" hx-target="#get-target" class="btn btn-warning mt-4">Complete your profile.</button>
                 {% else %}
                     <button hx-get="/register/user_type" hx-target="#get-target" class="btn btn-success mt-4">Profile Complete! Redo?</button>
                 {% endif %} -->
-            </div>
         </div>
-        
-        
     </div>
+
+
+</div>
 {% endblock content %}

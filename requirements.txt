@@ -16,3 +16,4 @@ django-compressor==4.4
 Pillow == 10.4.0
 certifi==2024.2.2
 sendgrid == 6.11.0
+docusign_esign == 4.0.0

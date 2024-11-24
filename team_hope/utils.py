@@ -1,9 +1,11 @@
-from django.core.mail import send_mail,EmailMultiAlternatives
+from django.core.mail import send_mail, EmailMultiAlternatives
 import sendgrid
 from sendgrid.helpers.mail import Mail
 from django.conf import settings
 from datetime import datetime
 from .models import UserProfile, UserIdentityInfo
+from .mailchimp_contact_manager import MailchimpContactManager
+
 
 def user_profile_is_complete(user):
     profile = UserProfile.objects.filter(user=user).first()
@@ -22,40 +24,42 @@ def user_profile_is_complete(user):
 
     return True
 
+
 def send_team_hope_welcome_email(user, custom_message=None):
     try:
         default_message = (
             f"Welcome, {user.first_name}!\n\n"
             "Thank you for registering with Team Hope. We are excited to have you on board!"
         )
-        
+
         message = custom_message if custom_message else default_message
 
-        send_mail('Welcome to Team Hope!',
-                message,
-                'Team Hope <contact@embracingostomylife.org>',
-                [user.email],
-                fail_silently=False)
-                  
-
+        send_mail(
+            "Welcome to Team Hope!",
+            message,
+            "Team Hope <contact@embracingostomylife.org>",
+            [user.email],
+            fail_silently=False,
+        )
 
     except Exception as e:
         print(f"Error sending email: {e}")
+
 
 def send_aliveandkicking_welcome_email(user, custom_message=None):
 
     try:
         default_message = (
-        f"Welcome, {user.first_name}!\n\n"
-        "Thank you for registering with Alive & Kicking. We are excited to have you on board!"
+            f"Welcome, {user.first_name}!\n\n"
+            "Thank you for registering with Alive & Kicking. We are excited to have you on board!"
         )
 
         message = custom_message if custom_message else default_message
 
         send_mail(
-            'Welcome to Alive & Kicking!',
+            "Welcome to Alive & Kicking!",
             message,
-            'Alive & Kicking <contact@embracingostomylife.org>',
+            "Alive & Kicking <contact@embracingostomylife.org>",
             [user.email],
             fail_silently=False,
         )
@@ -70,13 +74,13 @@ def send_embracingostomylife_welcome_email(user, custom_message=None):
             f"Welcome, {user.first_name}!\n\n"
             "Thank you for registering with Embracing Ostomy Life. We are excited to have you on board!"
         )
-        
+
         message = custom_message if custom_message else default_message
 
         send_mail(
-            'Welcome to Embracing Ostomy Life!',
+            "Welcome to Embracing Ostomy Life!",
             message,
-            'Embracing Ostomy Life <contact@embracingostomylife.org>',  
+            "Embracing Ostomy Life <contact@embracingostomylife.org>",
             [user.email],
             fail_silently=False,
         )
@@ -86,9 +90,8 @@ def send_embracingostomylife_welcome_email(user, custom_message=None):
 
 def sendgrid_unsubscribe_user(email):
     sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-    response = sg.client.asm.suppressions.delete(request_body={'emails': [email]})
+    response = sg.client.asm.suppressions.delete(request_body={"emails": [email]})
     return response.status_code == 204  # Check if the unsubscription was successful
-
 
 
 def validate_age(birth_year):
@@ -118,6 +121,7 @@ from django.conf import settings
 
 #     return response.status_code == 201  # Return True if the unsubscribe was successful
 
+
 def send_team_hope_welcome_email_html(user, custom_message=None):
     try:
         # Default message if no custom message is provided
@@ -125,17 +129,17 @@ def send_team_hope_welcome_email_html(user, custom_message=None):
             f"Welcome, {user.first_name}!\n\n"
             "Thank you for registering with Team Hope. We are excited to have you on board!"
         )
-        
+
         message = custom_message if custom_message else default_message
-        
+
         # Create the HTML content using the create_email_content function
         html_content = create_email_content("Welcome to Team Hope!", message)
 
         # Set up the email
         email = EmailMultiAlternatives(
-            subject='Welcome to Team Hope!',
+            subject="Welcome to Team Hope!",
             body=message,  # Fallback for plain text
-            from_email='Team Hope <contact@embracingostomylife.org>',
+            from_email="Team Hope <contact@embracingostomylife.org>",
             to=[user.email],
         )
         email.attach_alternative(html_content, "text/html")  # Attach the HTML version
@@ -144,6 +148,30 @@ def send_team_hope_welcome_email_html(user, custom_message=None):
         email.send(fail_silently=False)
     except Exception as e:
         print(f"Error sending email: {e}")
+
+
+def add_to_aliveandkicking_journey(user, userprofile):
+    print(type(user))
+    first_name = user.first_name
+    last_name = user.last_name
+    email = user.email
+    surgery_type = userprofile.surgery_type
+    surgery_date = (
+        userprofile.surgery_date.strftime("%m/%d/%Y")
+        if userprofile.surgery_date
+        else ""
+    )
+
+    mailchimp = MailchimpContactManager()
+    response = mailchimp.add_contact(
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        surgery_date=surgery_date,
+        surgery_type=surgery_type,
+    )
+
+    print(response)
 
 
 def send_aliveandkicking_welcome_email_html(user, custom_message=None):
@@ -161,9 +189,9 @@ def send_aliveandkicking_welcome_email_html(user, custom_message=None):
 
         # Set up the email
         email = EmailMultiAlternatives(
-            subject='Welcome to Alive & Kicking!',
+            subject="Welcome to Alive & Kicking!",
             body=message,  # Fallback for plain text
-            from_email='Alive & Kicking <contact@embracingostomylife.org>',
+            from_email="Alive & Kicking <contact@embracingostomylife.org>",
             to=[user.email],
         )
         email.attach_alternative(html_content, "text/html")  # Attach the HTML version
@@ -181,17 +209,19 @@ def send_embracingostomylife_welcome_email_html(user, custom_message=None):
             f"Welcome, {user.first_name}!<br<br>"
             "Thank you for registering with Embracing Ostomy Life. <br<br>We are excited to have you on board!"
         )
-        
+
         message = custom_message if custom_message else default_message
 
         # Create the HTML content using the create_email_content function
-        html_content = create_email_content("Welcome to Embracing Ostomy Life!", message)
+        html_content = create_email_content(
+            "Welcome to Embracing Ostomy Life!", message
+        )
 
         # Set up the email
         email = EmailMultiAlternatives(
-            subject='Welcome to Embracing Ostomy Life!',
+            subject="Welcome to Embracing Ostomy Life!",
             body=message,  # Fallback for plain text
-            from_email='Embracing Ostomy Life <contact@embracingostomylife.org>',
+            from_email="Embracing Ostomy Life <contact@embracingostomylife.org>",
             to=[user.email],
         )
         email.attach_alternative(html_content, "text/html")  # Attach the HTML version
@@ -202,7 +232,6 @@ def send_embracingostomylife_welcome_email_html(user, custom_message=None):
         print(f"Error sending email: {e}")
 
 
-
 def create_email_content(title, message_content):
     """
     Generates the HTML content for an email.
@@ -211,7 +240,7 @@ def create_email_content(title, message_content):
     :param message_content: The main content or body of the email.
     :return: A string containing the HTML content of the email.
     """
-    
+
     # HTML email template
     email_content = f"""
     <html>
@@ -301,6 +330,4 @@ def create_email_content(title, message_content):
     </html>
     """
 
-
-    
     return email_content

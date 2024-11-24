@@ -1,27 +1,35 @@
 {% extends "base.html" %}
-{% block title %}Register for Alive and Kicking{% endblock %}
+{% load form_tags %}
+{% block title %}Register for Alive & Kicking{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Register for Alive and Kicking</h2>
+    <div class="row mb-3">
+        <div class="col-md-12 align-items-center">
+            <div class="d-flex flex-column align-items-center">
+                <img src="https://embracingostomylife.org/wp-content/uploads/2024/05/aklogo-horizontal.png"
+                    alt="Alive & Kicking" class="h-12 w-auto">
+            </div>
+        </div>
+    </div>
+    <h2>Register for Alive & Kicking</h2>
     <form method="post">
         {% csrf_token %}
-        
         <div class="form-group row">
             <!-- Surgery Date -->
-            <div class="col-md-6">
-                <label for="id_surgery_date">Surgery date:</label>
-                {{ form.surgery_date }}
-                {% if form.surgery_date.errors %}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.surgery_date.label_tag }}
+                    {{ form.surgery_date|add_class:"form-control" }}
+                    {% if form.surgery_date.errors %}
                     <div class="text-danger">
                         {{ form.surgery_date.errors }}
                     </div>
-                {% endif %}
-            </div>
-
-            <!-- Days till Surgery Label -->
-            <div class="col-md-6">
-                <label for="days_till_surgery_label">Days till Surgery:</label>
-                <span id="days_till_surgery_label" class="form-control-plaintext"></span>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {{ form.surgery_type.label_tag }}
+                    {{ form.surgery_type|add_class:"form-control" }}
+                </div>
             </div>
         </div>
 
@@ -30,37 +38,13 @@
             {{ form.certify }}
             {{ form.certify.label_tag }}
             {% if form.certify.errors %}
-                <div class="text-danger">
-                    {{ form.certify.errors }}
-                </div>
+            <div class="text-danger">
+                {{ form.certify.errors }}
+            </div>
             {% endif %}
         </div>
 
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
 </div>
-
-<script>
-    // Function to calculate days till surgery
-    function calculateDaysTillSurgery() {
-        const surgeryDateInput = document.getElementById("id_surgery_date").value;
-        const daysTillSurgeryLabel = document.getElementById("days_till_surgery_label");
-
-        if (surgeryDateInput) {
-            const surgeryDate = new Date(surgeryDateInput);
-            const today = new Date();
-            const timeDiff = surgeryDate.getTime() - today.getTime();
-            const daysTillSurgery = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            daysTillSurgeryLabel.textContent = daysTillSurgery >= 0 ? daysTillSurgery +1 : 0;
-        } else {
-            daysTillSurgeryLabel.textContent = "No surgery date set";
-        }
-    }
-
-    // Calculate on initial page load
-    calculateDaysTillSurgery();
-
-    // Calculate whenever surgery date is changed
-    document.getElementById("id_surgery_date").addEventListener("change", calculateDaysTillSurgery);
-</script>
 {% endblock content %}
