@@ -184,13 +184,17 @@ def docusign_webhook(request):
     # Process the payload (customize as per your requirements)
     print("Webhook received:", payload_data)
 
-    if "data" in payload_data and "envelopeId" in payload_data["data"]["envelopeId"]:
+    if payload_data.get("event", "") == "recipient-completed" and payload_data.get(
+        "envelopeId"
+    ):
         # search the user by envelopeId
         try:
-            envelope_id = payload_data["data"]["envelopeId"]
+            print("Finding User.")
+            envelope_id = payload_data.get("envelopeId")
             profile = UserProfile.objects.get(
                 docusign_aliveandkicking_envelope_id=envelope_id
             )
+            print(f"Finding User {profile}")
             profile.aliveandkicking_waiver_complete = True
             profile.save()
         except UserProfile.DoesNotExist:
