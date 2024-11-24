@@ -6,13 +6,31 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import login
 from django.contrib.auth.views import LogoutView
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+    HttpResponseBadRequest,
+)
 from django.conf import settings
 from datetime import datetime
 import jwt
 import time
 from jwt import PyJWKClient
-from .forms import RegisterAliveAndKickingForm, RegisterForm, ProfileForm, ProfilePictureForm, RegisterTeamHopeForm
+import hmac
+import hashlib
+import base64
+import json
+from django.views.decorators.csrf import csrf_exempt
+
+
+from .forms import (
+    RegisterAliveAndKickingForm,
+    RegisterForm,
+    ProfileForm,
+    ProfilePictureForm,
+    RegisterTeamHopeForm,
+)
 from .models import UserProfile, UserIdentityInfo, UserType
 from .cometchat import CCUser
 from .utils import sendgrid_unsubscribe_user, user_profile_is_complete, validate_age
@@ -23,14 +41,18 @@ from django.contrib.auth import logout
 from django.contrib.auth import logout as django_logout
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from .helpers.docusign_email_sender import DocuSignEmailSender
 
 
 def azure_b2c_login(request):
-    redirect_uri = request.build_absolute_uri(reverse('azure_b2c_callback'))
-    return HttpResponseRedirect(settings.AZURE_B2C_AUTH_URL.format(redirect_uri=redirect_uri))
+    redirect_uri = request.build_absolute_uri(reverse("azure_b2c_callback"))
+    return HttpResponseRedirect(
+        settings.AZURE_B2C_AUTH_URL.format(redirect_uri=redirect_uri)
+    )
+
 
 def azure_b2c_callback(request):
-    token = request.GET.get('id_token')
+    token = request.GET.get("id_token")
     if not token:
         return HttpResponse("Token not found in the response", status=400)
 
@@ -38,19 +60,27 @@ def azure_b2c_callback(request):
         jwks_url = f"https://{settings.AZURE_B2C_TENANT}.b2clogin.com/{settings.AZURE_B2C_TENANT}.onmicrosoft.com/{settings.AZURE_B2C_POLICY_NAME}/discovery/v2.0/keys"
         jwks_client = PyJWKClient(jwks_url)
         signing_key = jwks_client.get_signing_key_from_jwt(token)
-        payload = jwt.decode(token, signing_key.key, algorithms=['RS256'], audience=settings.AZURE_B2C_CLIENT_ID)
+        payload = jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=settings.AZURE_B2C_CLIENT_ID,
+        )
 
-        email = payload.get('emails', [None])[0]
-        username = email.split('@')[0] if email else payload.get('name')
-        first_name = payload.get('extension_FirstName', '')
-        last_name = payload.get('extension_LastName', '')
-        guid = payload.get('oid')
+        email = payload.get("emails", [None])[0]
+        username = email.split("@")[0] if email else payload.get("name")
+        first_name = payload.get("extension_FirstName", "")
+        last_name = payload.get("extension_LastName", "")
+        guid = payload.get("oid")
 
-        user, created = User.objects.get_or_create(email=email, defaults={
-            'username': username,
-            'first_name': first_name,
-            'last_name': last_name,
-        })
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "username": username,
+                "first_name": first_name,
+                "last_name": last_name,
+            },
+        )
 
         user.first_name = first_name
         user.last_name = last_name
@@ -61,7 +91,7 @@ def azure_b2c_callback(request):
         identity_info.save()
 
         profile, created = UserProfile.objects.get_or_create(user=user)
-        profile.country = payload.get('country', '')
+        profile.country = payload.get("country", "")
         profile.save()
 
         if profile.registration_complete:
@@ -69,7 +99,7 @@ def azure_b2c_callback(request):
             ccuser.sync()
 
         login(request, user)
-        return redirect('/home')
+        return redirect("/home")
 
     except jwt.ExpiredSignatureError:
         return HttpResponse("Token has expired", status=400)
@@ -79,27 +109,29 @@ def azure_b2c_callback(request):
         print(f"Error: {str(e)}")
         return HttpResponse("An error occurred.", status=500)
 
+
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
     form_class = ProfileForm
-    template_name = 'profile/edit_profile.html'
-    success_url = '/profile/'
+    template_name = "profile/edit_profile.html"
+    success_url = "/profile/"
 
     def get_object(self):
         return self.request.user.userprofile
+
 
 class ProfilePictureUpdateView(LoginRequiredMixin, UpdateView):
     model = UserProfile
     form_class = ProfilePictureForm
-    template_name = 'profile/edit_profile_picture.html'
-    success_url = '/profile/'
+    template_name = "profile/edit_profile_picture.html"
+    success_url = "/profile/"
 
     def get_object(self):
         return self.request.user.userprofile
 
-class CustomLogoutView(LogoutView):
-    template_name = 'registration/logged_out.html'
 
+class CustomLogoutView(LogoutView):
+    template_name = "registration/logged_out.html"
 
 
 def logout_view(request):
@@ -107,22 +139,92 @@ def logout_view(request):
     logout_url = settings.AZURE_B2C_LOGOUT_URL
     return redirect(logout_url)
 
+
 def logout_complete_view(request):
     # You can render a custom logout complete template or redirect to the home page
-    return render(request, 'team_hope/logout_complete.html')
+    return render(request, "team_hope/logout_complete.html")
 
+
+def verify_hmac_signature(secret, payload, signature):
+    """
+    Verify the HMAC signature of the payload sent by DocuSign.
+    """
+    key = bytes(secret, "utf-8")
+    payload = bytes(payload, "utf-8")
+    hmac_hash = hmac.new(key, payload, hashlib.sha256)
+    computed_signature = base64.b64encode(hmac_hash.digest()).decode("utf-8")
+    return hmac.compare_digest(computed_signature, signature)
+
+
+@csrf_exempt
+def docusign_webhook(request):
+    """
+    Handle DocuSign Connect webhook POST requests.
+    """
+    current_user = request.user
+    profile = UserProfile.objects.get(user=current_user)
+    profile.aliveandkicking_waiver_complete = True
+    profile.subscribed_to_aliveandkicking = False
+    profile.save()
+    print(profile)
+    exit
+
+    docusign_webhook_secret = settings.DS_CALLBACK_SECRET
+    if request.method != "POST":
+        return HttpResponseBadRequest("Invalid request method")
+
+    # Retrieve the HMAC signature from the headers
+    signature = request.headers.get("X-DocuSign-Signature-1")
+    if not signature:
+        return HttpResponseBadRequest("Missing HMAC signature")
+
+    # Get the payload from the request body
+    try:
+        payload = request.body.decode("utf-8")
+        payload_data = json.loads(payload)
+    except Exception as e:
+        return HttpResponseBadRequest(f"Invalid payload: {str(e)}")
+
+    # Verify the HMAC signature
+    if not verify_hmac_signature(docusign_webhook_secret, payload, signature):
+        return HttpResponseBadRequest("Invalid HMAC signature")
+
+    # Process the payload (customize as per your requirements)
+    print("Webhook received:", payload_data)
+
+    if "data" in payload_data and "envelopeId" in payload_data["data"]["envelopeId"]:
+        # search the user by envelopeId
+        try:
+            envelope_id = payload_data["data"]["envelopeId"]
+            profile = UserProfile.objects.get(
+                docusign_aliveandkicking_envelope_id=envelope_id
+            )
+            profile.aliveandkicking_waiver_complete = True
+            profile.save()
+        except UserProfile.DoesNotExist:
+            print("No profile found with the specified envelope ID.")
+            return None
+        except UserProfile.MultipleObjectsReturned:
+            print("Unexpected multiple profiles found with the same envelope ID.")
+            return None
+    # Return a success response
+    return JsonResponse({"message": "Webhook received successfully"}, status=200)
 
 
 def home(request):
     if not request.user.is_authenticated:
-        return redirect('azure_b2c_login')
+        return redirect("azure_b2c_login")
 
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
     is_profile_complete = user_profile_is_complete(current_user)
 
-    # Directly use the team_hope_all_complete and subscribed_to_aliveandkicking fields
-    if request.method == 'POST':
+    # print(profile.docusign_aliveandkicking_envelope_id)
+    # profile.subscribed_to_aliveandkicking = True
+    # profile.save()
+    # Directly use the team_hope_all_complete and
+    # subscribed_to_aliveandkicking fields
+    if request.method == "POST":
         form = RegisterForm(request.POST, instance=current_user.userprofile)
         if form.is_valid():
             profile = form.save(commit=False)
@@ -139,62 +241,81 @@ def home(request):
         form = RegisterForm(instance=current_user.userprofile)
 
     params = {
-        'chat_enabled': is_profile_complete,
-        'user_profile_is_complete': is_profile_complete,
-        'form': form,
-        'team_hope_complete': profile.team_hope_all_complete,  # Using team_hope_all_complete directly from profile
-        'alive_and_kicking_subscribed': profile.subscribed_to_aliveandkicking,  # Using subscribed_to_aliveandkicking directly from profile
+        "chat_enabled": is_profile_complete,
+        "user_profile_is_complete": is_profile_complete,
+        "form": form,
+        "team_hope_complete": profile.team_hope_all_complete,  # Using team_hope_all_complete directly from profile
+        "alive_and_kicking_subscribed": profile.subscribed_to_aliveandkicking,
+        "a_k_docusign_waiting": (
+            True
+            if not profile.subscribed_to_aliveandkicking
+            and profile.docusign_aliveandkicking_envelope_id
+            else False
+        ),  # Using subscribed_to_aliveandkicking directly from profile
     }
-    return render(request, 'team_hope/home.html', params)
+    return render(request, "team_hope/home.html", params)
 
 
 def index(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
     return redirect(azure_b2c_login)
+
 
 def user_type(request):
     if not request.user.is_authenticated:
-        return redirect('home')
-    return render(request, 'team_hope/registration/user_type.html')
+        return redirect("home")
+    return render(request, "team_hope/registration/user_type.html")
+
 
 def register_type(request):
     if not request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
 
-    if request.method == 'GET':
-        utype = request.GET.get('type')
-        if utype in [UserType.CONSIDERING_SURGERY, UserType.OSTOMATE, UserType.CAREGIVER, UserType.MEDICAL_PROFESSIONAL, UserType.SUPPORTER]:
+    if request.method == "GET":
+        utype = request.GET.get("type")
+        if utype in [
+            UserType.CONSIDERING_SURGERY,
+            UserType.OSTOMATE,
+            UserType.CAREGIVER,
+            UserType.MEDICAL_PROFESSIONAL,
+            UserType.SUPPORTER,
+        ]:
             profile.user_type = utype
             profile.save()
-            return render(request, 'team_hope/registration/location.html')
+            return render(request, "team_hope/registration/location.html")
 
-    return render(request, 'team_hope/registration/user_type.html')
+    return render(request, "team_hope/registration/user_type.html")
+
 
 def register_team_hope(request):
     if not request.user.is_authenticated:
-        return redirect('azure_b2c_login')
+        return redirect("azure_b2c_login")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = RegisterTeamHopeForm(request.POST, instance=profile)
         if form.is_valid():
             profile = form.save(commit=False)
-            
+
             profile.team_hope_docusign_complete = True
             profile.team_hope_training_complete = True
             profile.team_hope_all_complete = True
             profile.save()
-            return redirect('home')
+            return redirect("home")
+        else:
+            print(form.errors)
+            print("Form is invalid")
     else:
         form = RegisterTeamHopeForm(instance=profile)
 
-    return render(request, 'team_hope/register_team_hope.html', {'form': form})
+    return render(request, "team_hope/register_team_hope.html", {"form": form})
+
 
 def schedule_sendgrid_subscription(email, surgery_date):
     try:
@@ -202,16 +323,18 @@ def schedule_sendgrid_subscription(email, surgery_date):
 
         # Determine the send_at timestamp
         if surgery_date and surgery_date > datetime.now().date():
-            send_at = int(time.mktime(surgery_date.timetuple()))  # Schedule for the surgery date
+            send_at = int(
+                time.mktime(surgery_date.timetuple())
+            )  # Schedule for the surgery date
         else:
             send_at = int(time.time())  # Send immediately
 
         # Create the email
         message = Mail(
-            from_email='rolf@embracingostomylife.org',  # Ensure this email is verified in SendGrid
+            from_email="rolf@embracingostomylife.org",  # Ensure this email is verified in SendGrid
             to_emails=email,
-            subject='Alive and Kicking - Post Surgery Support',
-            html_content='<strong>Your post-surgery support emails will start soon.</strong>'
+            subject="Alive & Kicking - Post Surgery Support",
+            html_content="<strong>Your post-surgery support emails will start soon.</strong>",
         )
 
         # Set the send_at parameter for scheduling
@@ -228,32 +351,41 @@ def schedule_sendgrid_subscription(email, surgery_date):
 
 def register_alive_and_kicking(request):
     if not request.user.is_authenticated:
-        return redirect('azure_b2c_login')
+        return redirect("azure_b2c_login")
 
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = RegisterAliveAndKickingForm(request.POST, instance=profile)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.subscribed_to_aliveandkicking = True  # Set this programmatically
+            # profile.subscribed_to_aliveandkicking = True  # Set this programmatically
+
+            print(request.META.get("HTTP_REFERER"))
+
+            docusign = DocuSignEmailSender()
+            response = docusign.send_email(
+                customer_email=current_user.email,
+                customer_name=current_user.get_full_name(),
+            )
+            profile.docusign_aliveandkicking_envelope_id = response.get(
+                "envelope_id", ""
+            )
             profile.save()
 
             # Schedule SendGrid subscription or other post-processing
-            subscription_success = schedule_sendgrid_subscription(current_user.email, profile.surgery_date)
-            if not subscription_success:
-                #pring diagnostic message and details
+            # subscription_success = schedule_sendgrid_subscription(current_user.email, profile.surgery_date)
+            # if not subscription_success:
+            # pring diagnostic message and details
+            #    pass
+            # return HttpResponse("Failed to subscribe user to the email list.", status=500)
 
-                return HttpResponse("Failed to subscribe user to the email list.", status=500)
-            
-
-            return redirect('home')
+            return redirect("home")
     else:
         form = RegisterAliveAndKickingForm(instance=profile)
 
-    return render(request, 'team_hope/register_alive_and_kicking.html', {'form': form})
-
+    return render(request, "team_hope/register_alive_and_kicking.html", {"form": form})
 
 
 def unsubscribe_alive_and_kicking(request):
@@ -263,71 +395,83 @@ def unsubscribe_alive_and_kicking(request):
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
+        print("Unsubscribing from alive and kick.")
+        profile.aliveandkicking_waiver_complete = False
         profile.subscribed_to_aliveandkicking = False
         profile.save()
 
         # Unsubscribe the user from the SendGrid list
-        success = sendgrid_unsubscribe_user(profile.user.email)
+        success = True  # sendgrid_unsubscribe_user(profile.user.email)
         if success:
-            messages.success(request, "You have successfully unsubscribed from Alive and Kicking.")
+            messages.success(
+                request, "You have successfully unsubscribed from Alive & Kicking."
+            )
         else:
-            messages.error(request, "There was an issue unsubscribing you. Please try again later.")
-        
-        return redirect('home')
+            messages.error(
+                request, "There was an issue unsubscribing you. Please try again later."
+            )
 
-    return render(request, 'team_hope/unsubscribe_alive_and_kicking.html')
+        return redirect("home")
+
+    return render(request, "team_hope/unsubscribe_alive_and_kicking.html")
+
 
 def register_location(request):
     if not request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
 
-    if request.method == 'POST':
-        country = request.POST.get('country')
+    if request.method == "POST":
+        country = request.POST.get("country")
         if country and country in state_countries_dict:
             profile.country = country
-            state = request.POST.get('state')
+            state = request.POST.get("state")
             if state and state in state_countries_dict[country]:
                 profile.state = state
             profile.save()
-            return render(request, 'team_hope/registration/journey.html')
+            return render(request, "team_hope/registration/journey.html")
 
-    return render(request, 'team_hope/registration/location.html')
+    return render(request, "team_hope/registration/location.html")
+
 
 def register_journey(request):
     if not request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
 
-    if request.method == 'POST':
-        journey = request.POST.get('journey')
+    if request.method == "POST":
+        journey = request.POST.get("journey")
         if journey:
             profile.journey = journey[:4000]
             profile.save()
-            return redirect('register_confirm')
+            return redirect("register_confirm")
 
-    return render(request, 'team_hope/registration/journey.html')
+    return render(request, "team_hope/registration/journey.html")
+
 
 def register_confirm(request):
     if not request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
             # Process the form data here
             pass
 
-    return render(request, 'team_hope/registration/confirm.html')
+    return render(request, "team_hope/registration/confirm.html")
+
 
 def chat(request):
-    if not request.user.is_authenticated: #or not user_profile_is_complete(request.user):
-        return redirect('home')
+    if (
+        not request.user.is_authenticated
+    ):  # or not user_profile_is_complete(request.user):
+        return redirect("home")
 
     current_user = request.user
     ccuser = CCUser(current_user)
@@ -339,16 +483,16 @@ def chat(request):
             ccuser_info = ccuser.get()
     except Exception as error:
         print(f"Failed to get or create CometChat user: {error}")
-        return redirect('home')
+        return redirect("home")
 
     if ccuser_info:
         params = {
-            'COMET_APP_ID': settings.COMET_APP_ID,
-            'COMET_REGION': settings.COMET_REGION,
-            'COMET_AUTH_KEY': settings.COMET_AUTH_KEY,
-            'DEPLOYENV': settings.DEPLOYENV,
-            'UID': ccuser_info['uid'],
+            "COMET_APP_ID": settings.COMET_APP_ID,
+            "COMET_REGION": settings.COMET_REGION,
+            "COMET_AUTH_KEY": settings.COMET_AUTH_KEY,
+            "DEPLOYENV": settings.DEPLOYENV,
+            "UID": ccuser_info["uid"],
         }
-        return render(request, 'team_hope/chat.html', params)
+        return render(request, "team_hope/chat.html", params)
 
-    return redirect('home')
+    return redirect("home")

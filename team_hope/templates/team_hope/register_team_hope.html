@@ -1,14 +1,24 @@
 {% extends "base.html" %}
 {% load form_tags %}
 
-{% block header %}Register for Team Hope{% endblock %}
+{% block header %}
+Register for Team Hope
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
+    <div class="row mb-3">
+        <div class="col-md-12 align-items-center">
+            <div class="d-flex flex-column align-items-center">
+                <img src="https://embracingostomylife.org/wp-content/uploads/graphics/teamhope-logo.png"
+                    alt="Team Hope Logo" class="h-12 w-auto">
+            </div>
+        </div>
+    </div>
     <h2 class="text-center mb-4">Register for Team Hope</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        
+
         <!-- Country and State -->
         <div class="row mb-3">
             <div class="col-md-6">
@@ -22,9 +32,14 @@
             <div class="col-md-6">
                 <label for="profile_picture" class="form-label">Profile Picture</label>
                 <div class="d-flex flex-column align-items-center">
-                    <img id="profile-picture-preview" src="#" alt="Profile Picture Preview" class="img-fluid mb-2" style="max-width: 150px; display: none;">
-                    <input type="file" name="profile_picture" id="profile_picture" class="form-control" onchange="previewImage(event)" style="width: 100%;">
+                    <img id="profile-picture-preview" src="#" alt="Profile Picture Preview" class="img-fluid mb-2"
+                        style="max-width: 150px; display: none;">
+                    <input type="file" name="profile_picture" id="profile_picture" class="form-control"
+                        onchange="previewImage(event)" style="width: 100%;">
                 </div>
+            </div>
+            <div class="col-md-6">
+
             </div>
         </div>
 
@@ -100,7 +115,9 @@
             <div class="col-md-12">
                 <div class="form-check">
                     {{ form.certify|add_class:"form-check-input" }}
-                    <label class="form-check-label" for="{{ form.certify.id_for_label }}">I agree to the terms and conditions</label>
+                    <label class="form-check-label" for="{{ form.certify.id_for_label }}">I agree to the <a
+                            href='https://embracingostomylife.org/terms-of-use/' target='_blank'>terms and
+                            conditions</a></label>
                 </div>
             </div>
         </div>
@@ -116,7 +133,7 @@
 <script>
     function previewImage(event) {
         var reader = new FileReader();
-        reader.onload = function() {
+        reader.onload = function () {
             var output = document.getElementById('profile-picture-preview');
             output.src = reader.result;
             output.style.display = 'block';
