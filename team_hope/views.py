@@ -189,27 +189,39 @@ def docusign_webhook(request):
         # search the user by envelopeId
         try:
             print("Finding User.")
-            envelope_id = payload_data["data"].get("envelopeId")
-            profile = UserProfile.objects.get(
-                docusign_aliveandkicking_envelope_id=envelope_id
-            )
-            profile = UserProfile.objects.get(
+            envelope_id = str(payload_data["data"].get("envelopeId"))
+            print(f"for envelope ID {envelope_id}.")
+            profile = UserProfile.objects.filter(
                 Q(docusign_aliveandkicking_envelope_id=envelope_id)
                 | Q(docusign_teamhope_envelope_id=envelope_id)
-            )
+            ).first()
 
-            print(f"Found User {profile}")
-            if profile.docusign_aliveandkicking_envelope_id == envelope_id:
-                profile.aliveandkicking_waiver_complete = True
+            if profile:
+                print(f"Found User {profile}")
+                if profile.docusign_aliveandkicking_envelope_id == envelope_id:
+                    profile.aliveandkicking_waiver_complete = True
+                else:
+                    profile.team_hope_docusign_complete = True
+                profile.save()
             else:
-                profile.team_hope_docusign_complete = True
-            profile.save()
+                print(profile)
+                raise UserProfile.DoesNotExist
         except UserProfile.DoesNotExist:
-            print("No profile found with the specified envelope ID.")
-            return None
+            print(f"No profile found with the specified envelope ID {envelope_id}.")
+            return JsonResponse(
+                {
+                    "message": f"No profile found with the specified envelope ID {envelope_id}"
+                },
+                status=404,
+            )
         except UserProfile.MultipleObjectsReturned:
             print("Unexpected multiple profiles found with the same envelope ID.")
-            return None
+            return JsonResponse(
+                {
+                    "message": "Unexpected multiple profiles found with the same envelope ID"
+                },
+                status=400,
+            )
     # Return a success response
     return JsonResponse({"message": "Webhook received successfully"}, status=200)
 
@@ -221,11 +233,6 @@ def home(request):
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
     is_profile_complete = user_profile_is_complete(current_user)
-
-    # profile.team_hope_docusign_complete = True
-    # profile.save()
-    print(profile.subscribed_to_teamhope)
-    print(profile.team_hope_docusign_complete)
     if request.method == "POST":
         form = RegisterForm(request.POST, instance=current_user.userprofile)
         if form.is_valid():
@@ -381,10 +388,6 @@ def register_alive_and_kicking(request):
         form = RegisterAliveAndKickingForm(request.POST, instance=profile)
         if form.is_valid():
             profile = form.save(commit=False)
-            # profile.subscribed_to_aliveandkicking = True  # Set this programmatically
-
-            print(request.META.get("HTTP_REFERER"))
-
             docusign = DocuSignEmailSender()
             response = docusign.send_email(
                 customer_email=current_user.email,
@@ -394,18 +397,9 @@ def register_alive_and_kicking(request):
                 "envelope_id", ""
             )
             profile.save()
-
-            # Schedule SendGrid subscription or other post-processing
-            # subscription_success = schedule_sendgrid_subscription(current_user.email, profile.surgery_date)
-            # if not subscription_success:
-            # pring diagnostic message and details
-            #    pass
-            # return HttpResponse("Failed to subscribe user to the email list.", status=500)
-
             return redirect("home")
     else:
         form = RegisterAliveAndKickingForm(instance=profile)
-
     return render(request, "team_hope/register_alive_and_kicking.html", {"form": form})
 
 
@@ -417,7 +411,6 @@ def unsubscribe_alive_and_kicking(request):
     profile = UserProfile.objects.get(user=current_user)
 
     if request.method == "POST":
-        print("Unsubscribing from alive and kick.")
         profile.aliveandkicking_waiver_complete = False
         profile.subscribed_to_aliveandkicking = False
         profile.docusign_aliveandkicking_envelope_id = ""
@@ -447,7 +440,6 @@ def unsubscribe_teamhope(request):
     profile = UserProfile.objects.get(user=current_user)
 
     if request.method == "POST":
-        print("Unsubscribing from alive and kick.")
         profile.subscribed_to_teamhope = False
         profile.team_hope_docusign_complete = False
         profile.docusign_teamhope_envelope_id = ""
