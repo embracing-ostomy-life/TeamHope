@@ -69,7 +69,12 @@ DEBUG = True
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"  # AZURE_B2C_LOGOUT_URL
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "169.254.131.3",
+    "localhost:8000",
+    "localhost",
+    "app.embracingostomylife.org",
+]
 
 if "CODESPACE_NAME" in os.environ:
     CSRF_TRUSTED_ORIGINS = [
