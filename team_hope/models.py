@@ -15,8 +15,7 @@ class UserType(models.TextChoices):
 
 
 class OstomateType(models.TextChoices):
-    ILEOSTOMY = "Ileostomy", _("Ileostomy")
-    COLOSTOMY = "Colostomy", _("Colostomy")
+    COLOSTOMY = "Colostomy", _("Colostomy/Ileostomy")
     UROSTOMY = "Urostomy", _("Urostomy")
     OTHER = "Other", _("Other")
 
@@ -102,6 +101,11 @@ class SecondaryLanguageChoices(models.TextChoices):
     NONE = "None", _("None")
 
 
+class TeamHopeMemberRoleChoices(models.TextChoices):
+    PARTICIPANT = "Participant"
+    VOLUNTEER = "Volunteer"
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.CharField(
@@ -155,6 +159,15 @@ class UserProfile(models.Model):
     team_hope_training_complete = models.BooleanField(default=False)
     team_hope_all_complete = models.BooleanField(default=False, editable=False)
     docusign_aliveandkicking_envelope_id = models.TextField(default="", editable=False)
+    docusign_teamhope_envelope_id = models.TextField(default="", editable=False)
+    subscribed_to_teamhope = models.BooleanField(default=False)
+    teamhope_member_role = models.CharField(
+        max_length=100,
+        choices=TeamHopeMemberRoleChoices.choices,
+        default=TeamHopeMemberRoleChoices.PARTICIPANT,
+        null=True,
+        blank=True,
+    )
     aliveandkicking_waiver_complete = models.BooleanField(default=False)
     registration_complete = models.BooleanField(default=False)
 

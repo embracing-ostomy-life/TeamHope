@@ -39,7 +39,8 @@ Register for Team Hope
                 </div>
             </div>
             <div class="col-md-6">
-
+                {{ form.teamhope_member_role.label_tag }}
+                {{ form.teamhope_member_role|add_class:"form-control" }}
             </div>
         </div>
 
@@ -54,7 +55,6 @@ Register for Team Hope
                 {{ form.surgery_type|add_class:"form-control" }}
             </div>
         </div>
-
         <!-- Surgeon and Hospital -->
         <div class="row mb-3">
             <div class="col-md-6">
@@ -123,8 +123,11 @@ Register for Team Hope
         </div>
 
         <div class="row mb-3">
-            <div class="col-md-12 text-center">
+            <div class="col-md-12">
                 <button type="submit" class="btn btn-lg btn-primary">Register</button>
+            </div>
+            <div class="col-md-12">
+                <p><b>Please check your email after signing and complete your Docusign Participation agreement.</b></p>
             </div>
         </div>
     </form>

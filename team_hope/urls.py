@@ -66,5 +66,10 @@ urlpatterns = [
         views.unsubscribe_alive_and_kicking,
         name="unsubscribe_alive_and_kicking",
     ),  # Add this line
+    path(
+        "unsubscribe/teamhope",
+        views.unsubscribe_teamhope,
+        name="unsubscribe_teamhope",
+    ),  # Add this line
     path("docusign/webhook", views.docusign_webhook, name="docusign_webhook"),
 ]

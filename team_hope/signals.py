@@ -10,6 +10,7 @@ from .utils import (
     send_aliveandkicking_welcome_email_html,
     send_embracingostomylife_welcome_email_html,
     add_to_aliveandkicking_journey,
+    add_to_teamhope_journey,
 )
 
 
@@ -43,6 +44,11 @@ def send_aliveandkicking_welcome(sender, instance, **kwargs):
         profile.save()
         # send_aliveandkicking_welcome_email(instance.user)
         # send_aliveandkicking_welcome_email_html(instance.user)
+    if not instance.subscribed_to_teamhope and instance.team_hope_docusign_complete:
+        add_to_teamhope_journey(user=instance.user, userprofile=instance)
+        profile = instance
+        profile.subscribed_to_teamhope = True
+        profile.save()
 
 
 @receiver(post_save, sender=User)

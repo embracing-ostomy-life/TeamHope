@@ -1,5 +1,11 @@
 from django import forms
-from .models import UserProfile, UserType, OstomateType, RelationshipStatus
+from .models import (
+    UserProfile,
+    UserType,
+    OstomateType,
+    RelationshipStatus,
+    TeamHopeMemberRoleChoices,
+)
 from django import forms
 from django.utils.safestring import mark_safe
 import datetime
@@ -38,6 +44,12 @@ class RegisterTeamHopeForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}),
         required=False,
     )
+    teamhope_member_role = forms.ChoiceField(
+        choices=TeamHopeMemberRoleChoices.choices,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=True,
+        label="Please select your Team Hope member role",
+    )
 
     class Meta:
         model = UserProfile
@@ -60,6 +72,7 @@ class RegisterTeamHopeForm(forms.ModelForm):
             "surgery_date": forms.DateInput(
                 attrs={"type": "date", "class": "form-control"}
             ),
+            "teamhope_member_role": forms.Select(attrs={"class": "form-control"}),
             "surgery_type": forms.Select(attrs={"class": "form-control"}),
             "surgeon_name": forms.TextInput(attrs={"class": "form-control"}),
             "hospital_name": forms.TextInput(attrs={"class": "form-control"}),

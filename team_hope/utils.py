@@ -174,6 +174,23 @@ def add_to_aliveandkicking_journey(user, userprofile):
     print(response)
 
 
+def add_to_teamhope_journey(user, userprofile):
+    print(type(user))
+    first_name = user.first_name
+    last_name = user.last_name
+    email = user.email
+
+    mailchimp = MailchimpContactManager()
+    response = mailchimp.add_contact(
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        team_hope_member_role=userprofile.teamhope_member_role,
+    )
+
+    print(response)
+
+
 def send_aliveandkicking_welcome_email_html(user, custom_message=None):
     try:
         # Default message if no custom message is provided
