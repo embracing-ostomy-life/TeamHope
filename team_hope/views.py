@@ -22,6 +22,7 @@ import hashlib
 import base64
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 
 
 from .forms import (
@@ -31,7 +32,7 @@ from .forms import (
     ProfilePictureForm,
     RegisterTeamHopeForm,
 )
-from .models import UserProfile, UserIdentityInfo, UserType
+from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
 from .cometchat import CCUser
 from .utils import sendgrid_unsubscribe_user, user_profile_is_complete, validate_age
 from components.cascading_selects.states import state_countries_dict
@@ -192,8 +193,16 @@ def docusign_webhook(request):
             profile = UserProfile.objects.get(
                 docusign_aliveandkicking_envelope_id=envelope_id
             )
-            print(f"Finding User {profile}")
-            profile.aliveandkicking_waiver_complete = True
+            profile = UserProfile.objects.get(
+                Q(docusign_aliveandkicking_envelope_id=envelope_id)
+                | Q(docusign_teamhope_envelope_id=envelope_id)
+            )
+
+            print(f"Found User {profile}")
+            if profile.docusign_aliveandkicking_envelope_id == envelope_id:
+                profile.aliveandkicking_waiver_complete = True
+            else:
+                profile.team_hope_docusign_complete = True
             profile.save()
         except UserProfile.DoesNotExist:
             print("No profile found with the specified envelope ID.")
@@ -213,6 +222,10 @@ def home(request):
     profile = UserProfile.objects.get(user=current_user)
     is_profile_complete = user_profile_is_complete(current_user)
 
+    # profile.team_hope_docusign_complete = True
+    # profile.save()
+    print(profile.subscribed_to_teamhope)
+    print(profile.team_hope_docusign_complete)
     if request.method == "POST":
         form = RegisterForm(request.POST, instance=current_user.userprofile)
         if form.is_valid():
@@ -235,12 +248,19 @@ def home(request):
         "form": form,
         "team_hope_complete": profile.team_hope_all_complete,  # Using team_hope_all_complete directly from profile
         "alive_and_kicking_subscribed": profile.subscribed_to_aliveandkicking,
+        "teamhope_subscribed": profile.subscribed_to_teamhope,
         "a_k_docusign_waiting": (
             True
             if not profile.subscribed_to_aliveandkicking
             and profile.docusign_aliveandkicking_envelope_id
             else False
         ),  # Using subscribed_to_aliveandkicking directly from profile
+        "t_h_docusign_waiting": (
+            True
+            if not profile.subscribed_to_teamhope
+            and profile.docusign_teamhope_envelope_id
+            else False
+        ),  # Using subscribed_to_teamhope directly from profile
     }
     return render(request, "team_hope/home.html", params)
 
@@ -292,9 +312,21 @@ def register_team_hope(request):
         if form.is_valid():
             profile = form.save(commit=False)
 
-            profile.team_hope_docusign_complete = True
+            profile.team_hope_docusign_complete = False
             profile.team_hope_training_complete = True
             profile.team_hope_all_complete = True
+            docusign = DocuSignEmailSender()
+            if profile.teamhope_member_role == TeamHopeMemberRoleChoices.PARTICIPANT:
+                template_id = settings.DS_TEAM_HOPE_MEMBER_TEMPLATE_ID
+            else:
+                template_id = settings.DS_TEAM_HOPE_VOLUNTEER_TEMPLATE_ID
+
+            response = docusign.send_email(
+                customer_email=current_user.email,
+                customer_name=current_user.get_full_name(),
+                template_id=template_id,
+            )
+            profile.docusign_teamhope_envelope_id = response.get("envelope_id", "")
             profile.save()
             return redirect("home")
         else:
@@ -388,6 +420,7 @@ def unsubscribe_alive_and_kicking(request):
         print("Unsubscribing from alive and kick.")
         profile.aliveandkicking_waiver_complete = False
         profile.subscribed_to_aliveandkicking = False
+        profile.docusign_aliveandkicking_envelope_id = ""
         profile.save()
 
         # Unsubscribe the user from the SendGrid list
@@ -404,6 +437,36 @@ def unsubscribe_alive_and_kicking(request):
         return redirect("home")
 
     return render(request, "team_hope/unsubscribe_alive_and_kicking.html")
+
+
+def unsubscribe_teamhope(request):
+    if not request.user.is_authenticated:
+        return redirect(azure_b2c_login)
+
+    current_user = request.user
+    profile = UserProfile.objects.get(user=current_user)
+
+    if request.method == "POST":
+        print("Unsubscribing from alive and kick.")
+        profile.subscribed_to_teamhope = False
+        profile.team_hope_docusign_complete = False
+        profile.docusign_teamhope_envelope_id = ""
+        profile.save()
+
+        # Unsubscribe the user from the SendGrid list
+        success = True  # sendgrid_unsubscribe_user(profile.user.email)
+        if success:
+            messages.success(
+                request, "You have successfully unsubscribed from Team Hope."
+            )
+        else:
+            messages.error(
+                request, "There was an issue unsubscribing you. Please try again later."
+            )
+
+        return redirect("home")
+
+    return render(request, "team_hope/unsubscribe_teamphope.html")
 
 
 def register_location(request):

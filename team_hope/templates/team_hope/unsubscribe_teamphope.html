@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Unsubscribe from Team hope{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Unsubscribe from Team hope</h2>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirm Unsubscription</button>
+    </form>
+</div>
+{% endblock content %}

@@ -22,6 +22,7 @@ class MailchimpContactManager:
         last_name=None,
         surgery_type=None,
         surgery_date=None,
+        team_hope_member_role=None,
     ):
         """
         Add a contact to a Mailchimp list.
@@ -41,12 +42,15 @@ class MailchimpContactManager:
                     "LNAME": last_name or "",
                     "SURG_DATE": surgery_date or "",
                     "SURG_TYPE": surgery_type or "",
+                    "TMEM_ROL": team_hope_member_role or "",
                 },
             }
 
             # Add contact to the list
-            response = self.client.lists.add_list_member(
-                list_id=self.list_id, body=member_info
+            response = self.client.lists.set_list_member(
+                list_id=self.list_id,
+                body=member_info,
+                subscriber_hash=str(email).lower(),
             )
             return response
         except ApiClientError as error:
