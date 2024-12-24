@@ -5,11 +5,7 @@
       <img src="https://embracingostomylife.org/wp-content/uploads/2024/05/header-logo.png" alt="Team Hope Logo"
         class="h-12 w-auto">
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+    <div class="justify-content-end" id="navbarNav">
       <ul class="navbar-nav">
         {% if request.user.is_active and request.user.is_staff %}
         <li class="nav-item">

@@ -1,16 +1,27 @@
 :root {
-    --brand-green-seafoam: #BFE89F; /* Sage */
-    --brand-teal-ocean: #196E77;    /* Ocean Teal */
-    --brand-orange-salmon: #FF8653; /* Salmon */
-    --brand-purple-royal: #5C33C2;  /* Royal Purple */
-    --brand-blue-sky: #C0F1F7;      /* Sky */
-    --brand-pink-bubblegum: #FFABD6;/* Bubblegum */
-    --brand-yellow-sunflower: #FFD800; /* Sunflower */
-    --brand-black-charcoal: #282828;  /* Charcoal */
-    --brand-grey-air: #EAEAEA;      /* Air */
-    --brand-coral-soft: #F96744;    /* Soft Coral */
-    --brand-blue-pop: #00A2D0;      /* Pop Blue */
-    
+    --brand-green-seafoam: #BFE89F;
+    /* Sage */
+    --brand-teal-ocean: #196E77;
+    /* Ocean Teal */
+    --brand-orange-salmon: #FF8653;
+    /* Salmon */
+    --brand-purple-royal: #5C33C2;
+    /* Royal Purple */
+    --brand-blue-sky: #C0F1F7;
+    /* Sky */
+    --brand-pink-bubblegum: #FFABD6;
+    /* Bubblegum */
+    --brand-yellow-sunflower: #FFD800;
+    /* Sunflower */
+    --brand-black-charcoal: #282828;
+    /* Charcoal */
+    --brand-grey-air: #EAEAEA;
+    /* Air */
+    --brand-coral-soft: #F96744;
+    /* Soft Coral */
+    --brand-blue-pop: #00A2D0;
+    /* Pop Blue */
+
     /* Define your font */
     --main-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --form-header-font: 'Segoe UI Bold', sans-serif;
@@ -24,7 +35,12 @@ body {
     font-family: var(--main-font-family);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: var(--brand-coral-soft);
 }
 
@@ -36,13 +52,14 @@ a:hover {
     color: var(--brand-orange-salmon);
 }
 
-.label{
+.label {
     font-family: var(--form-header-font);
     font-size: 1.5rem;
     color: var(--brand-black-charcoal);
     padding-right: 10px;
 }
-label{
+
+label {
     font-family: var(--form-header-font);
     font-size: 1.5rem;
     color: var(--brand-black-charcoal);
@@ -52,6 +69,10 @@ label{
 /* Navbar */
 .custom-navbar {
     background-color: var(--brand-green-seafoam);
+}
+
+.custom-navbar img {
+    max-width: 100%;
 }
 
 /* Logout Button */
@@ -115,7 +136,8 @@ label{
     margin-bottom: 10px;
 }
 
-form .row > .col-md-6, form .row > .col-md-12 {
+form .row>.col-md-6,
+form .row>.col-md-12 {
     margin-bottom: 10px;
 }
 
@@ -156,8 +178,10 @@ input[type="date"]:focus {
 }
 
 .textarea-short {
-    height: 100px; /* Adjust this value to control the height */
-    resize: vertical; /* Allow users to resize vertically */
+    height: 100px;
+    /* Adjust this value to control the height */
+    resize: vertical;
+    /* Allow users to resize vertically */
 }
 
 /* Custom Checkbox Design */
@@ -167,13 +191,13 @@ input[type="date"]:focus {
     cursor: pointer;
 }
 
-.custom-checkbox + .form-check-label {
+.custom-checkbox+.form-check-label {
     position: relative;
     padding-left: 30px;
     cursor: pointer;
 }
 
-.custom-checkbox + .form-check-label:before {
+.custom-checkbox+.form-check-label:before {
     content: "";
     position: absolute;
     left: 0;
@@ -185,12 +209,12 @@ input[type="date"]:focus {
     background-color: #fff;
 }
 
-.custom-checkbox:checked + .form-check-label:before {
+.custom-checkbox:checked+.form-check-label:before {
     background-color: var(--brand-teal-ocean);
     border-color: var(--brand-teal-ocean);
 }
 
-.custom-checkbox:checked + .form-check-label:after {
+.custom-checkbox:checked+.form-check-label:after {
     content: "";
     position: absolute;
     left: 7px;
@@ -228,4 +252,18 @@ input[type="date"]:focus {
 .hobbies-and-bio .col-md-6 {
     padding-right: 10px;
     padding-left: 10px;
+}
+
+@media screen and (max-width: 768px) {
+    .navbar.custom-navbar>.container {
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+
+    .navbar.custom-navbar>.container .navbar-collapse {
+        position: absolute;
+        left: auto;
+        right: 10px;
+        top: 60px;
+    }
 }

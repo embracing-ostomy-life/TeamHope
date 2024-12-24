@@ -72,6 +72,7 @@
 
         .card .btn-wrap {
             margin-bottom: 30px;
+            padding: 0px 15px;
         }
 
         .buttons.coral {
@@ -85,10 +86,28 @@
             text-decoration: none;
             background-color: #f96744;
             font-weight: 900;
+            text-align: center;
+            /* Centers the text */
+            box-sizing: border-box;
+            margin: auto;
         }
 
         .buttons.coral:hover {
             background-color: #ff8568;
+        }
+
+        @media screen and (max-width: 768px) {
+            .cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card {
+                width: 100%;
+                /* Adjust width for better mobile view */
+                margin-bottom: 20px;
+                /* Add some spacing between stacked cards */
+            }
         }
     </style>
     <div class="gb-container cards">
