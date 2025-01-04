@@ -129,7 +129,7 @@
                 {% if alive_and_kicking_subscribed %}
                 <a href="/unsubscribe/alive_and_kicking" class="gb-button gb-button-text buttons coral">Unsubscribe
                     from Alive & Kicking</a>
-                {% else %}
+                {% elif a_k_docusign_waiting == False %}
                 <a href="/register/alive_and_kicking" class="gb-button gb-button-text buttons coral">Register for Alive
                     & Kicking</a>
                 {% endif %}
@@ -149,7 +149,7 @@
                 {% if teamhope_subscribed %}
                 <a href="/unsubscribe/teamhope" class="gb-button gb-button-text buttons coral">Unsubscribe
                     from Team Hope</a>
-                {% else %}
+                {% elif t_h_docusign_waiting == False %}
                 <a class="gb-button gb-button-text buttons coral" href="/register/team_hope">Register for Team Hope</a>
                 {% endif %}
             </div>
