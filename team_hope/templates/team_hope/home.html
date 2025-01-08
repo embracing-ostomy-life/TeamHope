@@ -160,7 +160,7 @@
             <div class="gb-container text">
                 <p class="gb-headline gb-headline-text">Our on-line platform that allows Team HOPE members to
                     communicate in a secure environment.</p>
-                {% if form.certify %}
+                {% if chat_enabled and form.certify %}
                 {% else %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
