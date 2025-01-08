@@ -89,6 +89,10 @@ def azure_b2c_callback(request):
         identity_info, created = UserIdentityInfo.objects.get_or_create(user=user)
         identity_info.uuid = guid
         identity_info.save()
+        print(f"Identity Info saved with uuid {guid}")
+
+        identity_info1 = UserIdentityInfo.objects.get(user=user)
+        print(identity_info1)
 
         profile, created = UserProfile.objects.get_or_create(user=user)
         profile.country = payload.get("country", "")
@@ -519,6 +523,8 @@ def chat(request):
     ):  # or not user_profile_is_complete(request.user):
         return redirect("home")
 
+    user_identity = UserIdentityInfo.objects.get(user=request.user)
+    print(user_identity)
     current_user = request.user
     ccuser = CCUser(current_user)
 
@@ -529,7 +535,7 @@ def chat(request):
             ccuser_info = ccuser.get()
     except Exception as error:
         print(f"Failed to get or create CometChat user: {error}")
-        # return redirect("home")
+        return redirect("home")
 
     if ccuser_info:
         params = {

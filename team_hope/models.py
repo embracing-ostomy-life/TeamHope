@@ -204,4 +204,4 @@ class UserIdentityInfo(models.Model):
     uuid = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return f"Identity info for {self.user.username}"
+        return f"Identity info for {self.user.username} {self.uuid}"
