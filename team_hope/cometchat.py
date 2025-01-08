@@ -92,6 +92,8 @@ class CCUser:
 
     def get(self):
         identity_info = UserIdentityInfo.objects.get(user=self.django_user)
+        print(self.django_user)
+        print("UUID")
         print(identity_info.uuid)
         url = self.url + "/" + identity_info.uuid
         print("Getting CometChat user with UUID " + str(identity_info.uuid))

@@ -18,7 +18,7 @@ from .utils import (
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
-        UserIdentityInfo.objects.create(user=instance)
+        # UserIdentityInfo.objects.get_or_create(user=instance)
         # send_embracingostomylife_welcome_email(instance)
         # send_embracingostomylife_welcome_email_html(instance)
         pass
@@ -54,4 +54,4 @@ def send_aliveandkicking_welcome(sender, instance, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.userprofile.save()
-    instance.useridentityinfo.save()
+    # instance.useridentityinfo.save()
