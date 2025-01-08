@@ -67,7 +67,6 @@ def azure_b2c_callback(request):
             algorithms=["RS256"],
             audience=settings.AZURE_B2C_CLIENT_ID,
         )
-
         email = payload.get("emails", [None])[0]
         username = email.split("@")[0] if email else payload.get("name")
         first_name = payload.get("extension_FirstName", "")
@@ -232,7 +231,10 @@ def home(request):
 
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
-    is_profile_complete = user_profile_is_complete(current_user)
+    is_profile_complete = (
+        profile.registration_complete
+    )  # user_profile_is_complete(current_user)
+
     if request.method == "POST":
         form = RegisterForm(request.POST, instance=current_user.userprofile)
         if form.is_valid():
@@ -527,7 +529,7 @@ def chat(request):
             ccuser_info = ccuser.get()
     except Exception as error:
         print(f"Failed to get or create CometChat user: {error}")
-        return redirect("home")
+        # return redirect("home")
 
     if ccuser_info:
         params = {
