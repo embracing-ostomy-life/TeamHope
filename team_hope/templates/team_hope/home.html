@@ -142,16 +142,16 @@
                 <p class="gb-headline gb-headline-text">Connects new ostomates with volunteer
                     “veteran” ostomates who will listen, empathize, and suggest resources based on their experience.</p>
                 {% if t_h_docusign_waiting %}
-                <p><i><b>Thank you for signing up for the Team Hope Program.
+                <p><i><b>Thank you for signing up for the Team HOPE Program.
                             Please complete your Docusign Volunteer/Participation agreement.</i></b></p>
                 {% endif %}
             </div>
             <div class="gb-container btn-wrap">
                 {% if teamhope_subscribed %}
                 <a href="/unsubscribe/teamhope" class="gb-button gb-button-text buttons coral">Unsubscribe
-                    from Team Hope</a>
+                    from Team HOPE</a>
                 {% elif t_h_docusign_waiting == False %}
-                <a class="gb-button gb-button-text buttons coral" href="/register/team_hope">Register for Team Hope</a>
+                <a class="gb-button gb-button-text buttons coral" href="/register/team_hope">Register for Team HOPE</a>
                 {% endif %}
             </div>
         </div>
@@ -160,28 +160,28 @@
             <div class="gb-container text">
                 <p class="gb-headline gb-headline-text">Our on-line platform that allows Team HOPE members to
                     communicate in a secure environment.</p>
+                <!--
                 {% if chat_enabled and form.certify %}
                 {% else %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <!-- Certify and Submit -->
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <p><b>Agree to terms of use to access chat.</b></p>
-                            <div class="form-check">
-                                {{ form.certify|add_class:"form-check-input" }}
-                                <label class="form-check-label" for="{{ form.certify.id_for_label }}">I agree to the <a
-                                        href='https://embracingostomylife.org/terms-of-use/' target='_blank'>terms and
-                                        conditions</a></label>
-                            </div>
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <p><b>Agree to terms of use to access chat.</b></p>
+                        <div class="form-check">
+                            {{ form.certify|add_class:"form-check-input" }}
+                            <label class="form-check-label" for="{{ form.certify.id_for_label }}">I agree to the <a
+                                    href='https://embracingostomylife.org/terms-of-use/' target='_blank'>terms and
+                                    conditions</a></label>
                         </div>
                     </div>
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-lg btn-primary">Submit</button>
-                        </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-lg btn-primary">Submit</button>
                     </div>
+                </div>
                 </form>
                 {% endif %}
             </div>
@@ -190,7 +190,11 @@
                 <a href="/chat" class="gb-button gb-button-text buttons coral">Chat now</a>
             </div>
             {% endif %}
+            -->
+            </div>
+            <div class="gb-container btn-wrap">
+                <a class="gb-button gb-button-text buttons coral">Coming Soon</a>
+            </div>
         </div>
     </div>
-</div>
-{% endblock content %}
+    {% endblock content %}
