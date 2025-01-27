@@ -122,6 +122,29 @@ Register for Team Hope
             </div>
         </div>
 
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="form-check">
+                    {{ form.uoaa_taken|add_class:"form-check-input" }}
+                    <label class="form-check-label" for="{{ form.uoaa_taken.id_for_label }}">I have taken the UOAA
+                        online Ostomy Friends Program</a></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="form-check">
+                    {{ form.uoaa_nottaken|add_class:"form-check-input" }}
+                    <label class="form-check-label" for="{{ form.uoaa_nottaken.id_for_label }}">I have NOT taken the
+                        UOAA
+                        online Ostomy Friends Program – <a
+                            href='https://embracingostomylife.org/courses/the-ostomy-friends-program/'
+                            target='_blank'>Click here to take the course.</a></label>
+                </div>
+            </div>
+        </div>
+
         <div class="row mb-3">
             <div class="col-md-12">
                 <button type="submit" class="btn btn-lg btn-primary">Register</button>

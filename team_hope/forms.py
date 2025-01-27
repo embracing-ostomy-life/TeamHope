@@ -39,11 +39,33 @@ class RegisterTeamHopeForm(forms.ModelForm):
         widget=forms.CheckboxInput(),
         label="I agree to the terms and conditions",
     )
+
+    uoaa_taken = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label=mark_safe("I have taken the UOAA online Ostomy Friends Program"),
+    )
+
+    uoaa_nottaken = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label=mark_safe(
+            "I have NOT taken the UOAA online Ostomy Friends Program – <a href='https://embracingostomylife.org/courses/the-ostomy-friends-program/' target='_blank'>Click here to take the course.</a>"
+        ),
+    )
+
     surgery_type = forms.ChoiceField(
         choices=OstomateType.choices,
         widget=forms.Select(attrs={"class": "form-control"}),
-        required=False,
+        required=True,
     )
+
+    surgery_date = forms.DateField(
+        required=True,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        initial=datetime.date.today,  # Set initial value to today's date
+    )
+
     teamhope_member_role = forms.ChoiceField(
         choices=TeamHopeMemberRoleChoices.choices,
         widget=forms.Select(attrs={"class": "form-control"}),
@@ -92,6 +114,12 @@ class RegisterTeamHopeForm(forms.ModelForm):
             "hobbies": forms.Textarea(attrs={"class": "form-control"}),
             "bio": forms.Textarea(attrs={"class": "form-control"}),  # Added Bio field
         }
+
+    def clean_surgery_date(self):
+        surgery_date = self.cleaned_data.get("surgery_date")
+        if not surgery_date:
+            raise forms.ValidationError("The surgery date is required.")
+        return surgery_date
 
     def clean_certify(self):
         certify = self.cleaned_data.get("certify")
