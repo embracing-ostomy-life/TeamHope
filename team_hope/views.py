@@ -245,13 +245,11 @@ def home(request):
             profile = form.save(commit=False)
             profile.registration_complete = True
             profile.save()
-
             try:
                 ccuser = CCUser(current_user)
                 ccuser.sync()
             except Exception as error:
                 print(f"Failed to sync CometChat user: {error}")
-
     else:
         form = RegisterForm(instance=current_user.userprofile)
 

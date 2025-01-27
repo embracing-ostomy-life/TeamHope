@@ -156,11 +156,17 @@ def add_to_aliveandkicking_journey(user, userprofile):
     last_name = user.last_name
     email = user.email
     surgery_type = userprofile.surgery_type
-    surgery_date = (
-        userprofile.surgery_date.strftime("%m/%d/%Y")
-        if userprofile.surgery_date
-        else ""
-    )
+
+    if userprofile.surgery_date and userprofile.surgery_date < datetime.date.today():
+        surgery_date = datetime.date.today().strftime("%m/%d/%Y")
+    else:
+        surgery_date = (
+            userprofile.surgery_date.strftime("%m/%d/%Y")
+            if userprofile.surgery_date
+            else ""
+        )
+
+    print(surgery_date)
 
     mailchimp = MailchimpContactManager()
     response = mailchimp.add_contact(
