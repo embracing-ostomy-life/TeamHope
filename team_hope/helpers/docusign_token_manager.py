@@ -18,7 +18,7 @@ class DocuSignTokenManager:
 
     _instance = None
     _lock = Lock()
-    _private_key = """
+    _private_key_dev = """
 -----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEApUL/jzWLLNzrbkRivz/wBU5Qw6zWsJ31aowYWOrMz9kRJQaF
 Xbm6txUKxEjQRWXlX8AD71y4b/x9/qJORlsU2K6DHIUqb/6cRsoiQ06eV+7xzvOv
@@ -48,7 +48,7 @@ i4Zr7puY8XWtB63g3131KwVsMn8BUDgvb/qyfcD1/W8G8OcWduuW
 -----END RSA PRIVATE KEY-----
 """
 
-    _private_key_live = """
+    _private_key = """
 -----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAroOGF0m0C3YbQxsYyRL3ijIr4mPqnNZTMvIdxmqnc8M6CmNg
 n4OATiz4xY8gjH0ig0Zf2KZhx2KC4hSZPkq8e2Ck4v6AWmjru1dRPcJilwMCU2mU
