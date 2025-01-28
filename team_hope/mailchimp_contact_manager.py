@@ -37,14 +37,17 @@ class MailchimpContactManager:
             member_info = {
                 "email_address": email,
                 "status": "subscribed",
-                "merge_fields": {
-                    "FNAME": first_name or "",
-                    "LNAME": last_name or "",
-                    "SURG_DATE": surgery_date or "",
-                    "SURG_TYPE": surgery_type or "",
-                    "TMEM_ROL": team_hope_member_role or "",
-                },
+                "merge_fields": {"FNAME": first_name or "", "LNAME": last_name or ""},
             }
+
+            if surgery_date:
+                member_info["merge_fields"]["SURG_DATE"] = surgery_date
+
+            if surgery_type:
+                member_info["merge_fields"]["SURG_TYPE"] = surgery_type
+
+            if team_hope_member_role:
+                member_info["merge_fields"]["TMEM_ROL"] = team_hope_member_role
 
             # Add contact to the list
             response = self.client.lists.set_list_member(
