@@ -2,7 +2,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 import sendgrid
 from sendgrid.helpers.mail import Mail
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, date
 from .models import UserProfile, UserIdentityInfo
 from .mailchimp_contact_manager import MailchimpContactManager
 
@@ -157,8 +157,8 @@ def add_to_aliveandkicking_journey(user, userprofile):
     email = user.email
     surgery_type = userprofile.surgery_type
 
-    if userprofile.surgery_date and userprofile.surgery_date < datetime.date.today():
-        surgery_date = datetime.date.today().strftime("%m/%d/%Y")
+    if userprofile.surgery_date and userprofile.surgery_date < date.today():
+        surgery_date = date.today().strftime("%m/%d/%Y")
     else:
         surgery_date = (
             userprofile.surgery_date.strftime("%m/%d/%Y")
