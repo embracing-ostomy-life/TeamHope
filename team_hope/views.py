@@ -248,6 +248,7 @@ def home(request):
             try:
                 ccuser = CCUser(current_user)
                 ccuser.sync()
+                is_profile_complete = True
             except Exception as error:
                 print(f"Failed to sync CometChat user: {error}")
     else:
