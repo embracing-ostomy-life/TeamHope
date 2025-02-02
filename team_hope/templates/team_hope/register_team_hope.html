@@ -15,7 +15,8 @@ Register for Team Hope
             </div>
         </div>
     </div>
-    <h2 class="text-center mb-4">Register for Team Hope</h2>
+    <h2 class="text-center mb-4">Register for Team HOPE</h2>
+    <p>All Fields are Required unless marked 'optional'</p>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
@@ -30,7 +31,7 @@ Register for Team Hope
         <!-- Profile Picture -->
         <div class="row mb-3">
             <div class="col-md-6">
-                <label for="profile_picture" class="form-label">Profile Picture</label>
+                <label for="profile_picture" class="form-label">Profile Picture(Optional)</label>
                 <div class="d-flex flex-column align-items-center">
                     <img id="profile-picture-preview" src="#" alt="Profile Picture Preview" class="img-fluid mb-2"
                         style="max-width: 150px; display: none;">
@@ -91,10 +92,6 @@ Register for Team Hope
                 {{ form.primary_language.label_tag }}
                 {{ form.primary_language|add_class:"form-control" }}
             </div>
-            <div class="col-md-4">
-                {{ form.secondary_language.label_tag }}
-                {{ form.secondary_language|add_class:"form-control" }}
-            </div>
         </div>
 
         <!-- Hobbies and Bio -->
@@ -126,19 +123,8 @@ Register for Team Hope
             <div class="col-md-12">
                 <div class="form-check">
                     {{ form.uoaa_taken|add_class:"form-check-input" }}
-                    <label class="form-check-label" for="{{ form.uoaa_taken.id_for_label }}">I have taken the UOAA
-                        online Ostomy Friends Program</a></label>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="form-check">
-                    {{ form.uoaa_nottaken|add_class:"form-check-input" }}
-                    <label class="form-check-label" for="{{ form.uoaa_nottaken.id_for_label }}">I have NOT taken the
-                        UOAA
-                        online Ostomy Friends Program – <a
+                    <label class="form-check-label" for="{{ form.uoaa_taken.id_for_label }}">I have completed (or plan
+                        to complete within 14 days) the UOAA online Ostomy Friends Program – <a
                             href='https://embracingostomylife.org/courses/the-ostomy-friends-program/'
                             target='_blank'>Click here to take the course.</a></label>
                 </div>

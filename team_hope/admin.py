@@ -7,5 +7,51 @@ admin.site.register(UserIdentityInfo)
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("id", "surgery_date", "surgery_type", "teamhope_member_role")
-    list_filter = ("surgery_date", "surgery_type", "teamhope_member_role")
+    list_display = (
+        "id",
+        "get_first_name",
+        "get_last_name",
+        "teamhope_member_role",
+        "surgery_type",
+        "surgery_date",
+        "age",
+        "gender",
+        "relationship_status",
+        "primary_language",
+        "hobbies",
+    )
+    list_filter = (
+        "teamhope_member_role",
+        "surgery_date",
+        "surgery_type",
+        "age",
+        "gender",
+        "relationship_status",
+        "primary_language",
+    )
+
+    readonly_fields = ("get_email", "get_first_name", "get_last_name")
+
+    def get_username(self, obj):
+        return obj.user.username
+
+    get_username.admin_order_field = "user__username"  # Allows column sorting
+    get_username.short_description = "Username"
+
+    def get_first_name(self, obj):
+        return obj.user.first_name
+
+    get_first_name.admin_order_field = "user__first_name"
+    get_first_name.short_description = "First Name"
+
+    def get_last_name(self, obj):
+        return obj.user.last_name
+
+    get_last_name.admin_order_field = "user__last_name"
+    get_last_name.short_description = "Last Name"
+
+    def get_email(self, obj):
+        return obj.user.email
+
+    get_email.admin_order_field = "user__email"
+    get_email.short_description = "Email"
