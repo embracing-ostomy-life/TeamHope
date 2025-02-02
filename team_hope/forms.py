@@ -5,6 +5,8 @@ from .models import (
     OstomateType,
     RelationshipStatus,
     TeamHopeMemberRoleChoices,
+    PrimaryLanguageChoices,
+    EthnicityChoices,
 )
 from django import forms
 from django.utils.safestring import mark_safe
@@ -41,16 +43,10 @@ class RegisterTeamHopeForm(forms.ModelForm):
     )
 
     uoaa_taken = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(),
-        label=mark_safe("I have taken the UOAA online Ostomy Friends Program"),
-    )
-
-    uoaa_nottaken = forms.BooleanField(
-        required=False,
+        required=True,
         widget=forms.CheckboxInput(),
         label=mark_safe(
-            "I have NOT taken the UOAA online Ostomy Friends Program – <a href='https://embracingostomylife.org/courses/the-ostomy-friends-program/' target='_blank'>Click here to take the course.</a>"
+            "I have completed (or plan to complete within 14 days) the UOAA online Ostomy Friends Program – <a href='https://embracingostomylife.org/courses/the-ostomy-friends-program/' target='_blank'>Click here to take the course.</a>"
         ),
     )
 
@@ -73,6 +69,43 @@ class RegisterTeamHopeForm(forms.ModelForm):
         label="Please select your Team Hope member role",
     )
 
+    hobbies = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        required=True,
+    )
+
+    bio = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        required=True,
+        label="Anyting else you'd like us to know?",
+    )
+
+    age = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+        required=True,
+    )
+    gender = forms.ChoiceField(
+        widget=forms.Select(attrs={"class": "form-control"}),
+        choices=[
+            ("Male", "Male"),
+            ("Female", "Female"),
+            ("Other", "Other"),
+        ],
+        required=True,
+    )
+    relationship_status = forms.ChoiceField(
+        widget=forms.Select(attrs={"class": "form-control"}),
+        choices=RelationshipStatus.choices,
+        required=True,
+    )
+
+    primary_language = forms.ChoiceField(
+        choices=PrimaryLanguageChoices.choices,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=True,
+        label="Primary Language",
+    )
+
     class Meta:
         model = UserProfile
         exclude = [
@@ -89,6 +122,7 @@ class RegisterTeamHopeForm(forms.ModelForm):
             "team_hope_docusign_complete",
             "team_hope_training_complete",
             "aliveandkicking_waiver_complete",
+            "secondary_language",
         ]
         widgets = {
             "surgery_date": forms.DateInput(
@@ -112,7 +146,14 @@ class RegisterTeamHopeForm(forms.ModelForm):
             ),
             "pri": forms.TextInput(attrs={"class": "form-control"}),
             "hobbies": forms.Textarea(attrs={"class": "form-control"}),
-            "bio": forms.Textarea(attrs={"class": "form-control"}),  # Added Bio field
+            "bio": forms.Textarea(
+                attrs={"class": "form-control"},
+            ),  # Added Bio field
+        }
+
+        labels = {
+            "surgeon_name": "Surgeon name(Optional)",
+            "hospital_name": "Hospital name(Optional)",
         }
 
     def clean_surgery_date(self):
