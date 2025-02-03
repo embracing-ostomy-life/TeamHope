@@ -113,9 +113,6 @@ class UserProfile(models.Model):
         choices=UserType.choices,
         default=UserType.SUPPORTER,
     )
-    ostomy_type = models.CharField(
-        max_length=20, choices=OstomateType.choices, null=True, blank=True
-    )
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", null=True, blank=True
     )
@@ -171,12 +168,6 @@ class UserProfile(models.Model):
     registration_complete = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        if self.user_type == UserType.OSTOMATE:
-            if not self.ostomy_type:
-                raise ValueError("Ostomy type is required for Ostomates.")
-        elif self.user_type == UserType.CONSIDERING_SURGERY:
-            if not self.ostomy_type:
-                self.ostomy_type = OstomateType.OTHER
 
         self.team_hope_all_complete = all(
             [
