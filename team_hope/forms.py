@@ -77,7 +77,7 @@ class RegisterTeamHopeForm(forms.ModelForm):
     bio = forms.CharField(
         widget=forms.Textarea(attrs={"class": "form-control"}),
         required=True,
-        label="Anyting else you'd like us to know?",
+        label="Anything else you'd like us to know?",
     )
 
     age = forms.IntegerField(
@@ -176,7 +176,6 @@ class ProfileForm(forms.ModelForm):
         model = UserProfile
         fields = [
             "user_type",
-            "ostomy_type",
             "surgery_date",
             "surgery_type",
             "surgeon_name",
@@ -196,7 +195,6 @@ class ProfileForm(forms.ModelForm):
             "surgery_date": forms.DateInput(
                 attrs={"type": "date", "class": "form-control"}
             ),
-            "ostomy_type": forms.Select(attrs={"class": "form-control"}),
             "user_type": forms.Select(attrs={"class": "form-control"}),
             "surgery_type": forms.TextInput(attrs={"class": "form-control"}),
             "surgeon_name": forms.TextInput(attrs={"class": "form-control"}),
@@ -229,17 +227,6 @@ class ProfileForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        user_type = cleaned_data.get("user_type")
-        ostomy_type = cleaned_data.get("ostomy_type")
-
-        if user_type == UserType.OSTOMATE and not ostomy_type:
-            self.add_error("ostomy_type", "Ostomy type is required for Ostomates.")
-
-        if user_type == UserType.CONSIDERING_SURGERY and not ostomy_type:
-            cleaned_data["ostomy_type"] = (
-                OstomateType.OTHER
-            )  # Set to Other if not provided
-
         return cleaned_data
 
 

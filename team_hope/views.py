@@ -339,6 +339,14 @@ def register_team_hope(request):
                 template_id=template_id,
             )
             profile.docusign_teamhope_envelope_id = response.get("envelope_id", "")
+            is_profile_complete = False
+            try:
+                ccuser = CCUser(current_user)
+                ccuser.sync()
+                is_profile_complete = True
+            except Exception as error:
+                print(f"Failed to sync CometChat user: {error}")
+            profile.registration_complete = is_profile_complete
             profile.save()
             return redirect("home")
         else:
