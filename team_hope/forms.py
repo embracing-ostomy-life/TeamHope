@@ -77,7 +77,7 @@ class RegisterTeamHopeForm(forms.ModelForm):
     bio = forms.CharField(
         widget=forms.Textarea(attrs={"class": "form-control"}),
         required=True,
-        label="Anyting else you'd like us to know?",
+        label="Anything else you'd like us to know?",
     )
 
     age = forms.IntegerField(

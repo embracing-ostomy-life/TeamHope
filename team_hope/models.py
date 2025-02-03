@@ -164,7 +164,6 @@ class UserProfile(models.Model):
     teamhope_member_role = models.CharField(
         max_length=100,
         choices=TeamHopeMemberRoleChoices.choices,
-        default=TeamHopeMemberRoleChoices.PARTICIPANT,
         null=True,
         blank=True,
     )
