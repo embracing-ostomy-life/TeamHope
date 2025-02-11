@@ -43,7 +43,7 @@ class RegisterTeamHopeForm(forms.ModelForm):
     )
 
     uoaa_taken = forms.BooleanField(
-        required=True,
+        required=False,
         widget=forms.CheckboxInput(),
         label=mark_safe(
             "I have completed (or plan to complete within 14 days) the UOAA online Ostomy Friends Program – <a href='https://embracingostomylife.org/courses/the-ostomy-friends-program/' target='_blank'>Click here to take the course.</a>"
@@ -66,7 +66,7 @@ class RegisterTeamHopeForm(forms.ModelForm):
         choices=TeamHopeMemberRoleChoices.choices,
         widget=forms.Select(attrs={"class": "form-control"}),
         required=True,
-        label="Please select your Team Hope member role",
+        label="Team HOPE",
     )
 
     hobbies = forms.CharField(
@@ -76,8 +76,8 @@ class RegisterTeamHopeForm(forms.ModelForm):
 
     bio = forms.CharField(
         widget=forms.Textarea(attrs={"class": "form-control"}),
-        required=True,
-        label="Anything else you'd like us to know?",
+        required=False,
+        label="Anything else you'd like us to know?(Optional)",
     )
 
     age = forms.IntegerField(
