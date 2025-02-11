@@ -102,8 +102,8 @@ class SecondaryLanguageChoices(models.TextChoices):
 
 
 class TeamHopeMemberRoleChoices(models.TextChoices):
-    PARTICIPANT = "Participant"
-    VOLUNTEER = "Volunteer"
+    PARTICIPANT = "Participant", _("I want to Connect with a Veteran Ostimate")
+    VOLUNTEER = "Volunteer", _("Veteran Ostomate Volunteer")
 
 
 class UserProfile(models.Model):

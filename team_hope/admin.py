@@ -19,6 +19,9 @@ class UserProfileAdmin(admin.ModelAdmin):
         "relationship_status",
         "primary_language",
         "hobbies",
+        "bio",
+        "team_hope_docusign_complete",
+        "team_hope_training_complete",
     )
     list_filter = (
         "teamhope_member_role",
@@ -28,6 +31,8 @@ class UserProfileAdmin(admin.ModelAdmin):
         "gender",
         "relationship_status",
         "primary_language",
+        "team_hope_docusign_complete",
+        "team_hope_training_complete",
     )
 
     readonly_fields = ("get_email", "get_first_name", "get_last_name")
