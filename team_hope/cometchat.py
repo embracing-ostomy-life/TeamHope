@@ -140,7 +140,7 @@ class CCUser:
 
     def _add_name_param(self, params: dict):
         if self.django_user.username is not None:
-            params["name"] = self.django_user.username
+            params["name"] = f"{self.django_user.first_name.capitalize()} {self.django_user.last_name.capitalize()}"
 
     def _gen_params(self):
         user = self.django_user
