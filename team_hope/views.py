@@ -24,7 +24,6 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 
-
 from .forms import (
     RegisterAliveAndKickingForm,
     RegisterForm,
@@ -205,7 +204,14 @@ def docusign_webhook(request):
                     profile.aliveandkicking_waiver_complete = True
                 else:
                     profile.team_hope_docusign_complete = True
-                profile.save()
+                try:
+                    ccuser = CCUser(profile.user)
+                    ccuser.sync()
+                    profile.registration_complete = True
+                    profile.save()
+                except Exception as error:
+                    print(f"Failed to sync CometChat user: {error}")
+
             else:
                 print(profile)
                 raise UserProfile.DoesNotExist
@@ -264,13 +270,13 @@ def home(request):
         "a_k_docusign_waiting": (
             True
             if not profile.subscribed_to_aliveandkicking
-            and profile.docusign_aliveandkicking_envelope_id
+               and profile.docusign_aliveandkicking_envelope_id
             else False
         ),  # Using subscribed_to_aliveandkicking directly from profile
         "t_h_docusign_waiting": (
             True
             if not profile.subscribed_to_teamhope
-            and profile.docusign_teamhope_envelope_id
+               and profile.docusign_teamhope_envelope_id
             else False
         ),  # Using subscribed_to_teamhope directly from profile
     }
@@ -339,14 +345,7 @@ def register_team_hope(request):
                 template_id=template_id,
             )
             profile.docusign_teamhope_envelope_id = response.get("envelope_id", "")
-            is_profile_complete = False
-            try:
-                ccuser = CCUser(current_user)
-                ccuser.sync()
-                is_profile_complete = True
-            except Exception as error:
-                print(f"Failed to sync CometChat user: {error}")
-            profile.registration_complete = is_profile_complete
+            profile.registration_complete = False
             profile.save()
             return redirect("home")
         else:
@@ -526,7 +525,7 @@ def register_confirm(request):
 
 def chat(request):
     if (
-        not request.user.is_authenticated
+            not request.user.is_authenticated
     ):  # or not user_profile_is_complete(request.user):
         return redirect("home")
 
