@@ -206,7 +206,10 @@ def docusign_webhook(request):
                     profile.team_hope_docusign_complete = True
                 try:
                     ccuser = CCUser(profile.user)
-                    ccuser.sync()
+                    resp = ccuser.sync()
+                    print("******************************************************")
+                    print(resp)
+                    print("******************************************************")
                     profile.registration_complete = True
                     profile.save()
                 except Exception as error:

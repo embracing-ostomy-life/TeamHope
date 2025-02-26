@@ -121,6 +121,7 @@ class CCUser:
         print("Using headers: " + str(json_headers))
         response = requests.post(self.url, json=params, headers=json_headers)
         print("Create returned " + str(response.status_code) + " " + response.text)
+        return response
 
     def update(self):
         params = self._gen_params()
@@ -131,6 +132,7 @@ class CCUser:
         print("Using headers: " + str(json_headers))
         response = requests.put(url, json=params, headers=json_headers)
         print("Update returned " + str(response.status_code) + " " + response.text)
+        return response
 
     def _get_uid_param(self):
         identity_info = UserIdentityInfo.objects.get(user=self.django_user)
