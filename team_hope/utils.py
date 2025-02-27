@@ -6,6 +6,11 @@ from datetime import datetime, date
 from .models import UserProfile, UserIdentityInfo
 from .mailchimp_contact_manager import MailchimpContactManager
 
+COMETCHAT_ADMINS = [
+    "kalenshi@gmail.com",  # "patti@embracingostomylife.org",
+    "dlussky+6@gmail.com"  # "margaret@embracingostomylife.org"
+]
+
 
 def user_profile_is_complete(user):
     profile = UserProfile.objects.filter(user=user).first()
@@ -47,7 +52,6 @@ def send_team_hope_welcome_email(user, custom_message=None):
 
 
 def send_aliveandkicking_welcome_email(user, custom_message=None):
-
     try:
         default_message = (
             f"Welcome, {user.first_name}!\n\n"
@@ -103,6 +107,7 @@ def validate_age(birth_year):
 import requests
 from django.conf import settings
 
+
 # def sendgrid_unsubscribe_user(email):
 #     headers = {
 #         'Authorization': f'Bearer {settings.SENDGRID_API_KEY}',
@@ -148,6 +153,37 @@ def send_team_hope_welcome_email_html(user, custom_message=None):
         email.send(fail_silently=False)
     except Exception as e:
         print(f"Error sending email: {e}")
+
+
+def send_cometchat_admins_new_person_alert_email(user_profile, custom_message=None):
+    """
+    Once a user has completed the team hope docusing, an email is sent out to the
+    cometchat admins.
+     ["patti@embracingostomylife.org - Patti McCord","margaret@embracingostomylife.org - Margaret Cypher"]
+
+    Args:
+        user_profile (UserProfile): the user profile object
+        custom_message (str): A message to include in the email
+
+    Returns:
+        None
+    """
+    msg = f"""
+        A new user ({user_profile.user.first_name},{user_profile.user.last_name})
+        has signed up for Team HOPE and completed the Docusign. They are ready to be matched in CometChat.
+    """
+    subject = "New user signup"
+    try:
+        return send_mail(
+            subject=subject,
+            message=msg,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=COMETCHAT_ADMINS,
+            fail_silently=False,
+        )
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
 
 
 def add_to_aliveandkicking_journey(user, userprofile):

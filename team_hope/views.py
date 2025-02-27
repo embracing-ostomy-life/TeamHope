@@ -33,7 +33,8 @@ from .forms import (
 )
 from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
 from .cometchat import CCUser
-from .utils import sendgrid_unsubscribe_user, user_profile_is_complete, validate_age
+from .utils import sendgrid_unsubscribe_user, user_profile_is_complete, validate_age, \
+    send_cometchat_admins_new_person_alert_email
 from components.cascading_selects.states import state_countries_dict
 from django.shortcuts import redirect
 from django.conf import settings
@@ -204,14 +205,19 @@ def docusign_webhook(request):
                     profile.aliveandkicking_waiver_complete = True
                 else:
                     profile.team_hope_docusign_complete = True
-                try:
-                    ccuser = CCUser(profile.user)
-                    ccuser.sync()
-                    profile.registration_complete = True
-                    profile.save()
-                except Exception as error:
-                    print(f"Failed to sync CometChat user: {error}")
-
+                    # Only after signing the team hope docusing should the user be added to cometchat
+                    try:
+                        ccuser = CCUser(profile.user)
+                        resp = ccuser.sync()
+                        if "createdAt" in resp or "updatedAt" in resp:
+                            # The profile is being created or updated
+                            # either way, the profile can be marked as complete
+                            profile.registration_complete = True
+                            # Send email to chat admins
+                            send_cometchat_admins_new_person_alert_email(profile)
+                    except Exception as error:
+                        print(f"Failed to sync CometChat user: {error}")
+                profile.save()
             else:
                 print(profile)
                 raise UserProfile.DoesNotExist
