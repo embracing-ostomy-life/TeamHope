@@ -8,7 +8,7 @@ from .mailchimp_contact_manager import MailchimpContactManager
 
 COMETCHAT_ADMINS = [
     "kalenshi@gmail.com",  # "patti@embracingostomylife.org",
-    "dlussky+6@gmail.com"  # "margaret@embracingostomylife.org"
+    "dlussky@gmail.com"  # "margaret@embracingostomylife.org"
 ]
 
 
