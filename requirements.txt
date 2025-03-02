@@ -1,6 +1,5 @@
 Django==5.0.4
 django_components
-
 django-allauth[azuread]
 django-oidc
 psycopg2-binary==2.9.9
