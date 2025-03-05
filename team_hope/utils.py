@@ -1,10 +1,14 @@
-from django.core.mail import send_mail, EmailMultiAlternatives
-import sendgrid
-from sendgrid.helpers.mail import Mail
-from django.conf import settings
+import logging
 from datetime import datetime, date
-from .models import UserProfile, UserIdentityInfo
+
+import sendgrid
+from django.core.mail import send_mail, EmailMultiAlternatives
+
 from .mailchimp_contact_manager import MailchimpContactManager
+from .models import UserProfile, UserIdentityInfo
+
+# Create a logger
+logger = logging.getLogger(__name__)  # resolves to team_hope.utils
 
 COMETCHAT_ADMINS = [
     "kalenshi@gmail.com",  # "patti@embracingostomylife.org",
@@ -48,7 +52,7 @@ def send_team_hope_welcome_email(user, custom_message=None):
         )
 
     except Exception as e:
-        print(f"Error sending email: {e}")
+        logging.error(f"Failed  sending email to {user.email}: {e}")
 
 
 def send_aliveandkicking_welcome_email(user, custom_message=None):
@@ -68,7 +72,7 @@ def send_aliveandkicking_welcome_email(user, custom_message=None):
             fail_silently=False,
         )
     except Exception as e:
-        print(f"Error sending email: {e}")
+        logging.error(f"Failed  sending email to {user.email}: {e}")
 
 
 def send_embracingostomylife_welcome_email(user, custom_message=None):
@@ -89,7 +93,7 @@ def send_embracingostomylife_welcome_email(user, custom_message=None):
             fail_silently=False,
         )
     except Exception as e:
-        print(f"Error sending email: {e}")
+        logging.error(f"Failed  sending email to {user.email}: {e}")
 
 
 def sendgrid_unsubscribe_user(email):
@@ -104,27 +108,7 @@ def validate_age(birth_year):
     return age >= 18
 
 
-import requests
 from django.conf import settings
-
-
-# def sendgrid_unsubscribe_user(email):
-#     headers = {
-#         'Authorization': f'Bearer {settings.SENDGRID_API_KEY}',
-#         'Content-Type': 'application/json'
-#     }
-
-#     data = {
-#         "recipient_emails": [email]
-#     }
-
-#     response = requests.post(
-#         'https://api.sendgrid.com/v3/asm/suppressions/global',
-#         headers=headers,
-#         json=data
-#     )
-
-#     return response.status_code == 201  # Return True if the unsubscribe was successful
 
 
 def send_team_hope_welcome_email_html(user, custom_message=None):
@@ -152,7 +136,7 @@ def send_team_hope_welcome_email_html(user, custom_message=None):
         # Send the email
         email.send(fail_silently=False)
     except Exception as e:
-        print(f"Error sending email: {e}")
+        logging.error(f"Failed  sending email to {user.email}: {e}")
 
 
 def send_cometchat_admins_new_person_alert_email(user_profile, custom_message=None):
@@ -182,7 +166,7 @@ def send_cometchat_admins_new_person_alert_email(user_profile, custom_message=No
             fail_silently=False,
         )
     except Exception as e:
-        print(f"Error sending email: {e}")
+        logging.error(f"Failed  sending email to {COMETCHAT_ADMINS}: {e}")
         return False
 
 
@@ -202,8 +186,6 @@ def add_to_aliveandkicking_journey(user, userprofile):
             else ""
         )
 
-    print(surgery_date)
-
     mailchimp = MailchimpContactManager()
     response = mailchimp.add_contact(
         first_name=first_name,
@@ -213,11 +195,8 @@ def add_to_aliveandkicking_journey(user, userprofile):
         surgery_type=surgery_type,
     )
 
-    print(response)
-
 
 def add_to_teamhope_journey(user, userprofile):
-    print(type(user))
     first_name = user.first_name
     last_name = user.last_name
     email = user.email
@@ -229,8 +208,6 @@ def add_to_teamhope_journey(user, userprofile):
         email=email,
         team_hope_member_role=userprofile.teamhope_member_role,
     )
-
-    print(response)
 
 
 def send_aliveandkicking_welcome_email_html(user, custom_message=None):
@@ -258,7 +235,7 @@ def send_aliveandkicking_welcome_email_html(user, custom_message=None):
         # Send the email
         email.send(fail_silently=False)
     except Exception as e:
-        print(f"Error sending email: {e}")
+        logging.error(f"Failed  sending email to {user.email}: {e}")
 
 
 def send_embracingostomylife_welcome_email_html(user, custom_message=None):
@@ -288,7 +265,7 @@ def send_embracingostomylife_welcome_email_html(user, custom_message=None):
         # Send the email
         email.send(fail_silently=False)
     except Exception as e:
-        print(f"Error sending email: {e}")
+        logging.error(f"Failed  sending email to {user.email}: {e}")
 
 
 def create_email_content(title, message_content):

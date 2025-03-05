@@ -1,29 +1,37 @@
-from django.views.generic import UpdateView
+import base64
+import hashlib
+import hmac
+import json
+import logging
+import time
+from datetime import datetime
+
+import jwt
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth import logout as django_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib.auth import login
 from django.contrib.auth.views import LogoutView
+from django.db.models import Q
 from django.http import (
     HttpResponse,
     HttpResponseRedirect,
     JsonResponse,
     HttpResponseBadRequest,
 )
-from django.conf import settings
-from datetime import datetime
-import jwt
-import time
-from jwt import PyJWKClient
-import hmac
-import hashlib
-import base64
-import json
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Q
+from django.views.generic import UpdateView
+from jwt import PyJWKClient
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
+from components.cascading_selects.states import state_countries_dict
+from .cometchat import CCUser
 from .forms import (
     RegisterAliveAndKickingForm,
     RegisterForm,
@@ -31,18 +39,14 @@ from .forms import (
     ProfilePictureForm,
     RegisterTeamHopeForm,
 )
-from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
-from .cometchat import CCUser
-from .utils import sendgrid_unsubscribe_user, user_profile_is_complete, validate_age, \
-    send_cometchat_admins_new_person_alert_email
-from components.cascading_selects.states import state_countries_dict
-from django.shortcuts import redirect
-from django.conf import settings
-from django.contrib.auth import logout
-from django.contrib.auth import logout as django_logout
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 from .helpers.docusign_email_sender import DocuSignEmailSender
+from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
+from .utils import (
+    send_cometchat_admins_new_person_alert_email
+)
+
+# Create a logger
+logger = logging.getLogger(__name__)  # The name resolves to team_hope.views
 
 
 def azure_b2c_login(request):
@@ -55,6 +59,7 @@ def azure_b2c_login(request):
 def azure_b2c_callback(request):
     token = request.GET.get("id_token")
     if not token:
+        logger.error("Token with  was not found in the Response")
         return HttpResponse("Token not found in the response", status=400)
 
     try:
@@ -89,10 +94,9 @@ def azure_b2c_callback(request):
         identity_info, created = UserIdentityInfo.objects.get_or_create(user=user)
         identity_info.uuid = guid
         identity_info.save()
-        print(f"Identity Info saved with uuid {guid}")
+        logging.debug(f"Identity Info saved with uuid {guid}")
 
         identity_info1 = UserIdentityInfo.objects.get(user=user)
-        print(identity_info1)
 
         profile, created = UserProfile.objects.get_or_create(user=user)
         profile.country = payload.get("country", "")
@@ -106,11 +110,13 @@ def azure_b2c_callback(request):
         return redirect("/home")
 
     except jwt.ExpiredSignatureError:
+        logging.error("Token has expired")
         return HttpResponse("Token has expired", status=400)
     except jwt.InvalidTokenError:
+        logging.error("Token is invalid")
         return HttpResponse("Invalid token", status=400)
     except Exception as e:
-        print(f"Error: {str(e)}")
+        logging.error(f"An unexpected error : {e} occured ")
         return HttpResponse("An error occurred.", status=500)
 
 
@@ -179,6 +185,7 @@ def docusign_webhook(request):
         payload = request.body.decode("utf-8")
         payload_data = json.loads(payload)
     except Exception as e:
+        logger.warning("Invalid Payload!")
         return HttpResponseBadRequest(f"Invalid payload: {str(e)}")
 
     # Verify the HMAC signature
@@ -186,21 +193,20 @@ def docusign_webhook(request):
         return HttpResponseBadRequest("Invalid HMAC signature")
 
     # Process the payload (customize as per your requirements)
-    print("Webhook received:", payload_data)
+    logging.debug("Webhook received:", payload_data)
 
     if "data" in payload_data and "envelopeId" in payload_data["data"]:
         # search the user by envelopeId
         try:
-            print("Finding User.")
             envelope_id = str(payload_data["data"].get("envelopeId"))
-            print(f"for envelope ID {envelope_id}.")
+            logging.debug(f"Finding User with  envelope ID {envelope_id}.")
             profile = UserProfile.objects.filter(
                 Q(docusign_aliveandkicking_envelope_id=envelope_id)
                 | Q(docusign_teamhope_envelope_id=envelope_id)
             ).first()
 
             if profile:
-                print(f"Found User {profile}")
+                logging.debug(f"Found User {profile}")
                 if profile.docusign_aliveandkicking_envelope_id == envelope_id:
                     profile.aliveandkicking_waiver_complete = True
                 else:
@@ -216,13 +222,12 @@ def docusign_webhook(request):
                             # Send email to chat admins
                             send_cometchat_admins_new_person_alert_email(profile)
                     except Exception as error:
-                        print(f"Failed to sync CometChat user: {error}")
+                        logging.error(f"Failed to sync CometChat user: {error}")
                 profile.save()
             else:
-                print(profile)
                 raise UserProfile.DoesNotExist
         except UserProfile.DoesNotExist:
-            print(f"No profile found with the specified envelope ID {envelope_id}.")
+            logging.error(f"No profile found with the specified envelope ID {envelope_id}.")
             return JsonResponse(
                 {
                     "message": f"No profile found with the specified envelope ID {envelope_id}"
@@ -230,7 +235,7 @@ def docusign_webhook(request):
                 status=404,
             )
         except UserProfile.MultipleObjectsReturned:
-            print("Unexpected multiple profiles found with the same envelope ID.")
+            logging.warning(f"Unexpected multiple profiles found with the same envelope ID. {envelope_id}")
             return JsonResponse(
                 {
                     "message": "Unexpected multiple profiles found with the same envelope ID"
@@ -262,7 +267,7 @@ def home(request):
                 ccuser.sync()
                 is_profile_complete = True
             except Exception as error:
-                print(f"Failed to sync CometChat user: {error}")
+                logging.error(f"Failed to sync CometChat user: {error}")
     else:
         form = RegisterForm(instance=current_user.userprofile)
 
@@ -286,10 +291,12 @@ def home(request):
             else False
         ),  # Using subscribed_to_teamhope directly from profile
     }
+    logging.debug("Welcome home! Testing the logger at home", {"name": "Kalenshi"})
     return render(request, "team_hope/home.html", params)
 
 
 def index(request):
+    logger.info("Testing the logger")
     if request.user.is_authenticated:
         return redirect("home")
     return redirect(azure_b2c_login)
@@ -355,8 +362,8 @@ def register_team_hope(request):
             profile.save()
             return redirect("home")
         else:
-            print(form.errors)
-            print("Form is invalid")
+            logging.error("Error filling up the form", form.errors)
+            logging.debug("Error in team hope register form")
     else:
         form = RegisterTeamHopeForm(instance=profile)
 
@@ -391,7 +398,7 @@ def schedule_sendgrid_subscription(email, surgery_date):
 
         return response.status_code in [200, 202]
     except Exception as e:
-        print(f"Error: {str(e)}")  # Log the error for debugging
+        logging.error(f"Error in sendgrid subscription schedule: {str(e)}")  # Log the error for debugging
         return False
 
 
@@ -536,7 +543,7 @@ def chat(request):
         return redirect("home")
 
     user_identity = UserIdentityInfo.objects.get(user=request.user)
-    print(user_identity)
+    logging.info(f"Initiating chat by user with identity: {user_identity}")
     current_user = request.user
     ccuser = CCUser(current_user)
 
@@ -546,7 +553,7 @@ def chat(request):
             ccuser.sync()
             ccuser_info = ccuser.get()
     except Exception as error:
-        print(f"Failed to get or create CometChat user: {error}")
+        logging.error(f"Failed to get or create CometChat user: {error}")
         return redirect("home")
 
     if ccuser_info:
