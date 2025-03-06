@@ -290,10 +290,6 @@ LOGGING = {
         }
     },
     "formatters": {
-        "simple": {
-            "format": "{asctime}: {levelname}: {message}",
-            "style": "{",
-        },
         "verbose": {
             "format": "{asctime}: {levelname}: {name} IN {module}.py:(line {lineno:d}) : {message}",
             "style": "{",

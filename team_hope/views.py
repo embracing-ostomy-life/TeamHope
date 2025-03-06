@@ -267,7 +267,7 @@ def home(request):
             profile.save()
             try:
                 ccuser = CCUser(current_user)
-                ccuser.sync()
+                _ = ccuser.sync()
                 is_profile_complete = True
             except Exception as error:
                 logging.error(f"Failed to sync CometChat user: {error}")
