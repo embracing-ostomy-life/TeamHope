@@ -13,8 +13,17 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 
+import environ
+
+DEBUG = True
+env = environ.Env(
+    DEBUG=(bool, False)
+)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / '.env')
 
 print("\n\n\n\nIn normal settings :)\n\n\n\n")
 # Quick-start development settings - unsuitable for production
@@ -39,7 +48,6 @@ AZURE_POST_LOGOUT_REDIRECT_URI = os.getenv("APP_URL") + "/logout/complete/"
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 SENDGRID_ALIVE_AND_KICKING_ID = os.getenv("SENDGRID_ALIVE_AND_KICKING_ID")
 
-
 AZURE_B2C_AUTH_URL = f"https://{AZURE_B2C_TENANT}.b2clogin.com/{AZURE_B2C_TENANT}.onmicrosoft.com/oauth2/v2.0/authorize?p={AZURE_B2C_POLICY_NAME}&client_id={AZURE_B2C_CLIENT_ID}&response_type=id_token&redirect_uri={{redirect_uri}}&response_mode=query&scope=openid%20profile%20email&state=12345"
 AZURE_B2C_LOGOUT_URL = f"https://{AZURE_B2C_TENANT}.b2clogin.com/{AZURE_B2C_TENANT}.onmicrosoft.com/oauth2/v2.0/logout?p={AZURE_B2C_POLICY_NAME}&post_logout_redirect_uri={AZURE_POST_LOGOUT_REDIRECT_URI}"
 
@@ -62,7 +70,7 @@ MAILCHIMP_API_KEY = os.getenv("MAILCHIMP_API_KEY")
 MAILCHIMP_SERVER_KEY = os.getenv("MAILCHIMP_SERVER_KEY")
 MAILCHIMP_LIST_ID = os.getenv("MAILCHIMP_LIST_ID")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 
 # settings.py
 
@@ -84,7 +92,6 @@ if "CODESPACE_NAME" in os.environ:
 # Application definition
 
 INSTALLED_APPS = [
-    "team_hope.apps.TeamHopeConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -96,7 +103,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    #'allauth.socialaccount.providers.azure',#
+    "team_hope",
+    # 'allauth.socialaccount.providers.azure',#
 ]
 
 SITE_ID = 1
@@ -125,7 +133,6 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "components")]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -135,7 +142,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [os.path.join(BASE_DIR, "templates")],
-        #'APP_DIRS': True,
+        # 'APP_DIRS': True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -163,43 +170,34 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "embracing_ostomy_life.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 # To use sqllite as the database engine,
 #   uncomment the following block and comment out the Postgres section below
 
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-# }
-
 
 # Configure Postgres database for local development
 #   Set these environment variables in the .env file for this project.
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DBNAME"),
-        "HOST": os.environ.get("DBHOST"),
-        "USER": os.environ.get("DBUSER"),
-        "PASSWORD": os.environ.get("DBPASS"),
-    }
-}
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',#os.environ.get('DBNAME'),
-#         'HOST': 'localhost',#os.environ.get('DBHOST'),
-#         'PORT': '5431',#os.environ.get('DBPORT'),
-#         'USER': 'postgres',#os.environ.get('DBUSER'),
-#         'PASSWORD': 'TeamHope1',#os.environ.get('DBPASS'),
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.environ.get("DBNAME"),
+#         "HOST": os.environ.get("DBHOST"),
+#         "USER": os.environ.get("DBUSER"),
+#         "PASSWORD": os.environ.get("DBPASS"),
 #     }
 # }
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # os.environ.get('DBNAME'),
+        'HOST': 'localhost',  # os.environ.get('DBHOST'),
+        'PORT': '5431',  # os.environ.get('DBPORT'),
+        'USER': 'postgres',  # os.environ.get('DBUSER'),
+        'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
+    }
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"
@@ -256,15 +254,50 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATICFILES_DIRS = (str(BASE_DIR.joinpath("static")),)
 STATIC_URL = "static/"
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": env("DJANGO_LOG_FILE"),
+            "level": env("DJANGO_LOG_LEVEL"),
+            "formatter": "verbose",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": env("DJANGO_LOG_LEVEL"),
+            "formatter": "simple",
+        }
+
+    },
+    "loggers": {
+        "team_hope": {
+            "level": env("DJANGO_LOG_LEVEL"),
+            "handlers": ["file", "console"],
+            "propagate": True,
+        }
+    },
+    "formatters": {
+        "simple": {
+            "format": "{asctime}: {levelname}: {message}",
+            "style": "{",
+        },
+        "verbose": {
+            "format": "{asctime}: {levelname}: {name} IN {module}.py:(line {lineno:d}) : {message}",
+            "style": "{",
+        }
+    }
+
+}

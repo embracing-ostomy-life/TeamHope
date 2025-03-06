@@ -1,5 +1,5 @@
-Django==5.0.4
-django_components
+Django~=5.1.6
+django_components~=0.77
 
 django-allauth[azuread]
 django-oidc
@@ -18,3 +18,5 @@ certifi==2024.2.2
 sendgrid == 6.11.0
 docusign_esign == 4.0.0
 mailchimp_marketing == 3.0.80
+docusign-esign~=4.0.0
+django-environ~=0.12.0
