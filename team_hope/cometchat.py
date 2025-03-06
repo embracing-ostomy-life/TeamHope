@@ -111,10 +111,9 @@ class CCUser:
         """Update. Create if user doesn't exist."""
         get_res = self.get()
         if get_res is None:
-            self.create()
-            self.update()
+            return self.create()
         else:
-            self.update()
+            return self.update()
 
     def create(self):
         params = self._get_uid_param()
@@ -125,6 +124,7 @@ class CCUser:
         logging.debug(
             f"Create returned  status-code:- ({str(response.status_code)})\n And text {response.text}"
         )
+
         return response.json().get("data")
 
     def update(self):
