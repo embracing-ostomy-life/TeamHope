@@ -211,6 +211,7 @@ def docusign_webhook(request):
                     profile.aliveandkicking_waiver_complete = True
                 else:
                     profile.team_hope_docusign_complete = True
+
                     # Only after signing the team hope docusing should the user be added to cometchat
                     try:
                         ccuser = CCUser(profile.user)
@@ -219,6 +220,7 @@ def docusign_webhook(request):
                             # The profile is being created or updated
                             # either way, the profile can be marked as complete
                             profile.registration_complete = True
+                        if "createdAt" in resp and not "updatedAt" in resp:
                             # Send email to chat admins
                             send_cometchat_admins_new_person_alert_email(profile)
                     except Exception as error:
