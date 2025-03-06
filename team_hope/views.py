@@ -216,6 +216,7 @@ def docusign_webhook(request):
                     try:
                         ccuser = CCUser(profile.user)
                         resp = ccuser.sync()
+                        logging.debug(f"CCUser Response: ({resp})")
                         if "createdAt" in resp or "updatedAt" in resp:
                             # The profile is being created or updated
                             # either way, the profile can be marked as complete
@@ -293,7 +294,7 @@ def home(request):
             else False
         ),  # Using subscribed_to_teamhope directly from profile
     }
-    logging.debug("Welcome home! Testing the logger at home", {"name": "Kalenshi"})
+    logging.debug(f"Welcome Home {request.user.first_name}: {request.user.email}", )
     return render(request, "team_hope/home.html", params)
 
 
