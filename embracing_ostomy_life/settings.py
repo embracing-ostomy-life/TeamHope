@@ -278,7 +278,7 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
             "level": env("DJANGO_LOG_LEVEL"),
-            "formatter": "simple",
+            "formatter": "verbose",
         }
 
     },
