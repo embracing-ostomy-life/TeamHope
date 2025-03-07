@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)  # resolves to team_hope.utils
 COMETCHAT_ADMINS = [
     "kalenshi@gmail.com",  # "patti@embracingostomylife.org",
     "dlussky+6@gmail.com"  # "margaret@embracingostomylife.org"
-]
+] # TODO remove the tester emails and uncomment the real admin emails
 
 
 def user_profile_is_complete(user):
@@ -161,7 +161,7 @@ def send_cometchat_admins_new_person_alert_email(user_profile, custom_message=No
         return send_mail(
             subject=subject,
             message=msg,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email="patti@embracingostomylike.org",
             recipient_list=COMETCHAT_ADMINS,
             fail_silently=False,
         )
