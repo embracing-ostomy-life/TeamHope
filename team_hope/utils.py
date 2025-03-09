@@ -11,9 +11,9 @@ from .models import UserProfile, UserIdentityInfo
 logger = logging.getLogger(__name__)  # resolves to team_hope.utils
 
 COMETCHAT_ADMINS = [
-    "kalenshi@gmail.com",  # "patti@embracingostomylife.org",
-    "dlussky+6@gmail.com"  # "margaret@embracingostomylife.org"
-] # TODO remove the tester emails and uncomment the real admin emails
+    "patti@embracingostomylife.org",
+    "margaret@embracingostomylife.org"
+]
 
 
 def user_profile_is_complete(user):
@@ -156,7 +156,7 @@ def send_cometchat_admins_new_person_alert_email(user_profile, custom_message=No
         A new user ({user_profile.user.first_name},{user_profile.user.last_name})
         has signed up for Team HOPE and completed the Docusign. They are ready to be matched in CometChat.
     """
-    subject = "New user signup"
+    subject = "New User Signup for Team HOPE"
     try:
         return send_mail(
             subject=subject,
