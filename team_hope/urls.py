@@ -1,10 +1,11 @@
-from django.urls import path, include, re_path
-from django.contrib.auth import views as auth_views
-from django.views.generic import TemplateView
-from django.contrib import admin
 from django.conf import settings
+from django.contrib import admin
+from django.urls import path, include, re_path
+
 from . import views
+from .views import ProfileUpdateView, CustomLogoutView
 from .views import azure_b2c_login, azure_b2c_callback, home
+from .views import chat
 from .views import (
     user_type,
     register_type,
@@ -17,12 +18,8 @@ from .views import (
     logout_view,
     logout_complete_view,
 )
-from .views import chat, CustomLogoutView
 
-
-from .views import ProfileUpdateView, CustomLogoutView
-
-
+app_name = 'team_hope'
 urlpatterns = [
     path("tyn997tpjaekxycjvjjq7y/", admin.site.urls),
     path("components/", include("components.urls")),
