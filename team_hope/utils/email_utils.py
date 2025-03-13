@@ -4,8 +4,8 @@ from datetime import datetime, date
 import sendgrid
 from django.core.mail import send_mail, EmailMultiAlternatives
 
-from .mailchimp_contact_manager import MailchimpContactManager
-from .models import UserProfile, UserIdentityInfo
+from team_hope.mailchimp_contact_manager import MailchimpContactManager
+from team_hope.models import UserProfile, UserIdentityInfo
 
 # Create a logger
 logger = logging.getLogger(__name__)  # resolves to team_hope.utils

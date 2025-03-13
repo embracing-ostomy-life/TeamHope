@@ -1,17 +1,12 @@
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
-from .models import UserProfile, UserIdentityInfo
-from .utils import (
-    send_embracingostomylife_welcome_email,
-    send_aliveandkicking_welcome_email,
-    send_team_hope_welcome_email,
-    send_team_hope_welcome_email_html,
-    send_aliveandkicking_welcome_email_html,
-    send_embracingostomylife_welcome_email_html,
+
+from team_hope.utils.email_utils import (
     add_to_aliveandkicking_journey,
     add_to_teamhope_journey,
 )
+from .models import UserProfile
 
 
 @receiver(post_save, sender=User)
@@ -35,8 +30,8 @@ def send_team_hope_welcome(sender, instance, **kwargs):
 @receiver(post_save, sender=UserProfile)
 def send_aliveandkicking_welcome(sender, instance, **kwargs):
     if (
-        not instance.subscribed_to_aliveandkicking
-        and instance.aliveandkicking_waiver_complete
+            not instance.subscribed_to_aliveandkicking
+            and instance.aliveandkicking_waiver_complete
     ):
         add_to_aliveandkicking_journey(user=instance.user, userprofile=instance)
         profile = instance

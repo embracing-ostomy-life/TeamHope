@@ -31,6 +31,9 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 from components.cascading_selects.states import state_countries_dict
+from team_hope.utils.email_utils import (
+    send_cometchat_admins_new_person_alert_email
+)
 from .cometchat import CCUser
 from .forms import (
     RegisterAliveAndKickingForm,
@@ -41,16 +44,13 @@ from .forms import (
 )
 from .helpers.docusign_email_sender import DocuSignEmailSender
 from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
-from .utils import (
-    send_cometchat_admins_new_person_alert_email
-)
 
 # Create a logger
 logger = logging.getLogger(__name__)  # The name resolves to team_hope.views
 
 
 def azure_b2c_login(request):
-    redirect_uri = request.build_absolute_uri(reverse("azure_b2c_callback"))
+    redirect_uri = request.build_absolute_uri(reverse("team_hope:azure_b2c_callback"))
     return HttpResponseRedirect(
         settings.AZURE_B2C_AUTH_URL.format(redirect_uri=redirect_uri)
     )
@@ -96,8 +96,6 @@ def azure_b2c_callback(request):
         identity_info.save()
         logging.debug(f"Identity Info saved with uuid {guid}")
 
-        identity_info1 = UserIdentityInfo.objects.get(user=user)
-
         profile, created = UserProfile.objects.get_or_create(user=user)
         profile.country = payload.get("country", "")
         profile.save()
@@ -107,7 +105,7 @@ def azure_b2c_callback(request):
             ccuser.sync()
 
         login(request, user)
-        return redirect("/home")
+        return redirect("team_hope:home")
 
     except jwt.ExpiredSignatureError:
         logging.error("Token has expired")
@@ -116,7 +114,7 @@ def azure_b2c_callback(request):
         logging.error("Token is invalid")
         return HttpResponse("Invalid token", status=400)
     except Exception as e:
-        logging.error(f"An unexpected error : {e} occured ")
+        logging.error(f"An unexpected error : {e} occurred ")
         return HttpResponse("An error occurred.", status=500)
 
 
@@ -199,14 +197,14 @@ def docusign_webhook(request):
         # search the user by envelopeId
         try:
             envelope_id = str(payload_data["data"].get("envelopeId"))
-            logging.debug(f"Finding User with  envelope ID {envelope_id}.")
+            logging.info(f"Finding User with  envelope ID {envelope_id}.")
             profile = UserProfile.objects.filter(
                 Q(docusign_aliveandkicking_envelope_id=envelope_id)
                 | Q(docusign_teamhope_envelope_id=envelope_id)
             ).first()
 
             if profile:
-                logging.debug(f"Found User {profile}")
+                logging.info(f"Found User {profile}")
                 if profile.docusign_aliveandkicking_envelope_id == envelope_id:
                     profile.aliveandkicking_waiver_complete = True
                 else:
@@ -251,7 +249,7 @@ def docusign_webhook(request):
 
 def home(request):
     if not request.user.is_authenticated:
-        return redirect("azure_b2c_login")
+        return redirect("team_hope:azure_b2c_login")
 
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
@@ -301,19 +299,19 @@ def home(request):
 def index(request):
     logger.info("Testing the logger")
     if request.user.is_authenticated:
-        return redirect("home")
-    return redirect(azure_b2c_login)
+        return redirect("team_hope:home")
+    return redirect("team_hope:azure_b2c_login")
 
 
 def user_type(request):
     if not request.user.is_authenticated:
-        return redirect("home")
+        return redirect("team_hope:home")
     return render(request, "team_hope/registration/user_type.html")
 
 
 def register_type(request):
     if not request.user.is_authenticated:
-        return redirect("home")
+        return redirect("team_hope:home")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
@@ -336,16 +334,17 @@ def register_type(request):
 
 def register_team_hope(request):
     if not request.user.is_authenticated:
-        return redirect("azure_b2c_login")
+        return redirect("team_hope:azure_b2c_login")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
 
     if request.method == "POST":
-        form = RegisterTeamHopeForm(request.POST, instance=profile)
+        form = RegisterTeamHopeForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
+            logging.debug(form.cleaned_data)
+            filename = request.FILES.get("profile_picture")
             profile = form.save(commit=False)
-
             profile.team_hope_docusign_complete = False
             profile.team_hope_training_complete = True
             profile.team_hope_all_complete = True
@@ -363,10 +362,10 @@ def register_team_hope(request):
             profile.docusign_teamhope_envelope_id = response.get("envelope_id", "")
             profile.registration_complete = False
             profile.save()
-            return redirect("home")
+            return redirect("team_hope:home")
         else:
-            logging.error("Error filling up the form", form.errors)
-            logging.debug("Error in team hope register form")
+            logging.error(f"Error filling up the form: {form.errors}", )
+
     else:
         form = RegisterTeamHopeForm(instance=profile)
 
@@ -407,7 +406,7 @@ def schedule_sendgrid_subscription(email, surgery_date):
 
 def register_alive_and_kicking(request):
     if not request.user.is_authenticated:
-        return redirect("azure_b2c_login")
+        return redirect("team_home:azure_b2c_login")
 
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
@@ -425,7 +424,7 @@ def register_alive_and_kicking(request):
                 "envelope_id", ""
             )
             profile.save()
-            return redirect("home")
+            return redirect("team_hope:home")
     else:
         form = RegisterAliveAndKickingForm(instance=profile)
     return render(request, "team_hope/register_alive_and_kicking.html", {"form": form})
@@ -455,7 +454,7 @@ def unsubscribe_alive_and_kicking(request):
                 request, "There was an issue unsubscribing you. Please try again later."
             )
 
-        return redirect("home")
+        return redirect("team_hope:home")
 
     return render(request, "team_hope/unsubscribe_alive_and_kicking.html")
 
@@ -484,14 +483,14 @@ def unsubscribe_teamhope(request):
                 request, "There was an issue unsubscribing you. Please try again later."
             )
 
-        return redirect("home")
+        return redirect("team_hope:home")
 
     return render(request, "team_hope/unsubscribe_teamphope.html")
 
 
 def register_location(request):
     if not request.user.is_authenticated:
-        return redirect("home")
+        return redirect("team_hope:home")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
@@ -511,7 +510,7 @@ def register_location(request):
 
 def register_journey(request):
     if not request.user.is_authenticated:
-        return redirect("home")
+        return redirect("team_hope:home")
 
     current_user = request.user
     profile, created = UserProfile.objects.get_or_create(user=current_user)
@@ -528,7 +527,7 @@ def register_journey(request):
 
 def register_confirm(request):
     if not request.user.is_authenticated:
-        return redirect("home")
+        return redirect("team_hope:home")
 
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -543,7 +542,7 @@ def chat(request):
     if (
             not request.user.is_authenticated
     ):  # or not user_profile_is_complete(request.user):
-        return redirect("home")
+        return redirect("team_hope:home")
 
     user_identity = UserIdentityInfo.objects.get(user=request.user)
     logging.info(f"Initiating chat by user with identity: {user_identity}")
@@ -557,7 +556,7 @@ def chat(request):
             ccuser_info = ccuser.get()
     except Exception as error:
         logging.error(f"Failed to get or create CometChat user: {error}")
-        return redirect("home")
+        return redirect("team_hope:home")
 
     if ccuser_info:
         params = {
@@ -569,4 +568,4 @@ def chat(request):
         }
         return render(request, "team_hope/chat.html", params)
 
-    return redirect("home")
+    return redirect("team_hope:home")
