@@ -41,7 +41,7 @@ DEPLOYENV = os.getenv("DEPLOYENV")
 AZURE_ACCOUNT_NAME = env("AZURE_STORAGE_ACCOUNT_NAME")
 AZURE_ACCOUNT_KEY = env("AZURE_STORAGE_ACCOUNT_KEY")
 AZURE_CONTAINER = env("AZURE_STORAGE_CONTAINER_NAME")
-AZURE_CUSTOM_DOMAIN = f"{AZURE_ACCOUNT_NAME}/{AZURE_CONTAINER}.blob.core.windows.net"
+AZURE_CUSTOM_DOMAIN = f"{AZURE_ACCOUNT_NAME}.blob.core.windows.net"
 AZURE_B2C_CLIENT_ID = os.getenv("AZURE_B2C_CLIENT_ID")
 AZURE_B2C_CLIENT_SECRET = os.getenv("AZURE_B2C_CLIENT_SECRET")
 AZURE_B2C_TENANT = os.getenv("AZURE_B2C_TENANT")
@@ -176,15 +176,11 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, "templates"),
     "ream_hope/templates",
 )
-
+MEDIA_URL = f"{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/"
 WSGI_APPLICATION = "embracing_ostomy_life.wsgi.application"
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.azure_storage.AzureStorage",
-        "OPTIONS": {
-            "timeout": 20,
-        }
-
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",

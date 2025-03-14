@@ -114,7 +114,7 @@ class UserProfile(models.Model):
         default=UserType.SUPPORTER,
     )
     profile_picture = models.ImageField(
-        upload_to="profile_pics/", null=True, blank=True
+        upload_to="", null=True, blank=True
     )
     surgery_date = models.DateField(null=True, blank=True)
     surgery_type = models.CharField(
