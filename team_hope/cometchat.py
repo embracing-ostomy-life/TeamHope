@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from .models import UserIdentityInfo
+from .models import UserProfile
 
 REST_API_KEY = settings.COMET_REST_API_KEY
 REGION = settings.COMET_REGION
@@ -156,4 +157,10 @@ class CCUser:
         if user.email is not None:
             _metadata_params_add(metadata, "email", user.email)
             my_params["metadata"] = metadata
+        try:
+            profile = UserProfile.objects.get(user=user)
+            if profile.profile_picture:
+                my_params["avatar"] = profile.profile_picture.url
+        except UserProfile.DoesNotExist:
+            pass  # There is no user profile associated with the user
         return params

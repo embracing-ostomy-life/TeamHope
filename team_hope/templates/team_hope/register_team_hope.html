@@ -1,179 +1,179 @@
 {% extends "base.html" %}
+{% load static %}
 {% load form_tags %}
 
 {% block header %}
-Register for Team Hope
+    Register for Team Hope
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-3">
-        <div class="col-md-12 align-items-center">
-            <div class="d-flex flex-column align-items-center">
-                <img src="https://embracingostomylife.org/wp-content/uploads/graphics/teamhope-logo.png"
-                    alt="Team Hope Logo" class="h-12 w-auto">
-            </div>
-        </div>
-    </div>
-    <h2 class="text-center mb-4">Register for Team HOPE</h2>
-    <p><b>All Fields are Required unless marked 'optional'</b></p>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <!-- Country and State -->
+    <div class="container mt-5">
         <div class="row mb-3">
-            <div class="col-md-6">
-                {% component 'parent_select_cascading_selects' %}
-                {% endcomponent %}
-            </div>
-        </div>
-        <!-- Profile Picture -->
-        <div class="row mb-3">
-            <!--
-            <div class="col-md-6">
-                <label for="profile_picture" class="form-label">Profile Picture(Optional)</label>
+            <div class="col-md-12 align-items-center">
                 <div class="d-flex flex-column align-items-center">
-                    <img id="profile-picture-preview" src="#" alt="Profile Picture Preview" class="img-fluid mb-2"
-                        style="max-width: 150px; display: none;">
-                    <input type="file" name="profile_picture" id="profile_picture" class="form-control"
-                        onchange="previewImage(event)" style="width: 100%;">
+                    <img src="https://embracingostomylife.org/wp-content/uploads/graphics/teamhope-logo.png"
+                         alt="Team Hope Logo" class="h-12 w-auto">
                 </div>
             </div>
-            -->
-            <div class="col-md-12">
-                {{ form.teamhope_member_role.label_tag }}
-                {{ form.teamhope_member_role|add_class:"form-control" }}
-            </div>
         </div>
+        <h2 class="text-center mb-4">Register for Team HOPE</h2>
+        <p><b>All Fields are Required unless marked 'optional'</b></p>
+        <form method="post" enctype="multipart/form-data" action="{% url 'team_hope:register_team_hope' %}">
+            {% csrf_token %}
 
-        <!-- Surgery Date and Type -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                {{ form.surgery_date.label_tag }}
-                {{ form.surgery_date|add_class:"form-control" }}
+            <!-- Country and State -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {% component 'parent_select_cascading_selects' %}
+                    {% endcomponent %}
+                </div>
             </div>
-            <div class="col-md-6">
-                {{ form.surgery_type.label_tag }}
-                {{ form.surgery_type|add_class:"form-control" }}
+            <!-- Profile Picture -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.profile_picture.label_tag }}
+                    <div class="d-flex flex-column align-items-center">
+                        <img id="profile-picture-preview" src="#" alt="Profile Picture Preview" class="img-fluid mb-2"
+                             style="max-width: 150px; display: none;">
+                        {{ form.profile_picture }}
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    {{ form.teamhope_member_role.label_tag }}
+                    {{ form.teamhope_member_role|add_class:"form-control" }}
+                </div>
             </div>
-        </div>
-        <!-- Surgeon and Hospital -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                {{ form.surgeon_name.label_tag }}
-                {{ form.surgeon_name|add_class:"form-control" }}
-            </div>
-            <div class="col-md-6">
-                {{ form.hospital_name.label_tag }}
-                {{ form.hospital_name|add_class:"form-control" }}
-            </div>
-        </div>
 
-        <!-- Age, Gender, Relationship Status, Language -->
-        <div class="row mb-3">
-            <div class="col-md-3">
-                {{ form.age.label_tag }}
-                {{ form.age|add_class:"form-control" }}
+            <!-- Surgery Date and Type -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.surgery_date.label_tag }}
+                    {{ form.surgery_date|add_class:"form-control" }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.surgery_type.label_tag }}
+                    {{ form.surgery_type|add_class:"form-control" }}
+                </div>
             </div>
-            <div class="col-md-3">
-                {{ form.gender.label_tag }}
-                {{ form.gender|add_class:"form-control" }}
+            <!-- Surgeon and Hospital -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.surgeon_name.label_tag }}
+                    {{ form.surgeon_name|add_class:"form-control" }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.hospital_name.label_tag }}
+                    {{ form.hospital_name|add_class:"form-control" }}
+                </div>
             </div>
-            <div class="col-md-6">
-                {{ form.relationship_status.label_tag }}
-                {{ form.relationship_status|add_class:"form-control" }}
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-4">
-                {{ form.ethnicity.label_tag }}
-                {{ form.ethnicity|add_class:"form-control" }}
-            </div>
-            <div class="col-md-4">
-                {{ form.primary_language.label_tag }}
-                {{ form.primary_language|add_class:"form-control" }}
-            </div>
-        </div>
 
-        <!-- Hobbies and Bio -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                {{ form.hobbies.label_tag }}
-                {{ form.hobbies|add_class:"form-control textarea-short" }}
+            <!-- Age, Gender, Relationship Status, Language -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    {{ form.age.label_tag }}
+                    {{ form.age|add_class:"form-control" }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.gender.label_tag }}
+                    {{ form.gender|add_class:"form-control" }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.relationship_status.label_tag }}
+                    {{ form.relationship_status|add_class:"form-control" }}
+                </div>
             </div>
-            <div class="col-md-6">
-                {{ form.bio.label_tag }}
-                {{ form.bio|add_class:"form-control textarea-short" }}
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    {{ form.ethnicity.label_tag }}
+                    {{ form.ethnicity|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.primary_language.label_tag }}
+                    {{ form.primary_language|add_class:"form-control" }}
+                </div>
             </div>
-        </div>
 
-        <!-- Certify and Submit -->
-        <!-- Certify and Submit -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="form-check">
-                    {{ form.certify|add_class:"form-check-input" }}
-                    <label class="form-check-label" for="{{ form.certify.id_for_label }}">I agree to the <a
-                            href='https://embracingostomylife.org/terms-of-use/' target='_blank'>terms and
+            <!-- Hobbies and Bio -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.hobbies.label_tag }}
+                    {{ form.hobbies|add_class:"form-control textarea-short" }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.bio.label_tag }}
+                    {{ form.bio|add_class:"form-control textarea-short" }}
+                </div>
+            </div>
+
+            <!-- Certify and Submit -->
+            <!-- Certify and Submit -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="form-check">
+                        {{ form.certify|add_class:"form-check-input" }}
+                        <label class="form-check-label" for="{{ form.certify.id_for_label }}">I agree to the <a
+                                href='https://embracingostomylife.org/terms-of-use/' target='_blank'>terms and
                             conditions</a></label>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-4" id="take_the_course">
-            <div class="col-md-12">
-                <div class="form-check">
-                    {{ form.uoaa_taken|add_class:"form-check-input" }}
-                    <label class="form-check-label" for="{{ form.uoaa_taken.id_for_label }}">I have completed (or plan
-                        to complete within 14 days) the UOAA online Ostomy Friends Program – <a
-                            href='https://embracingostomylife.org/courses/the-ostomy-friends-program/'
-                            target='_blank'>Click here to take the course.</a></label>
+            <div class="row mb-4" id="take_the_course">
+                <div class="col-md-12">
+                    <div class="form-check">
+                        {{ form.uoaa_taken|add_class:"form-check-input" }}
+                        <label class="form-check-label" for="{{ form.uoaa_taken.id_for_label }}">I have completed (or
+                            plan
+                            to complete within 14 days) the UOAA online Ostomy Friends Program – <a
+                                    href='https://embracingostomylife.org/courses/the-ostomy-friends-program/'
+                                    target='_blank'>Click here to take the course.</a></label>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <button type="submit" class="btn btn-lg btn-primary">Register</button>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-lg btn-primary">Register</button>
+                </div>
+                <div class="col-md-12">
+                    <p><b>Please check your email after signing and complete your Docusign Participation agreement.</b>
+                    </p>
+                </div>
             </div>
-            <div class="col-md-12">
-                <p><b>Please check your email after signing and complete your Docusign Participation agreement.</b></p>
-            </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
-<script>
-    function previewImage(event) {
-        var reader = new FileReader();
-        reader.onload = function () {
-            var output = document.getElementById('profile-picture-preview');
-            output.src = reader.result;
-            output.style.display = 'block';
-        }
-        reader.readAsDataURL(event.target.files[0]);
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const roleSelect = document.getElementById("id_teamhope_member_role");
-        const takeTheCourseDiv = document.getElementById("take_the_course");
-        const uoaaTakenCheckbox = document.getElementById("id_uoaa_taken");
-
-        function toggleTakeTheCourse() {
-            if (roleSelect.value === "Volunteer") {
-                takeTheCourseDiv.style.display = "block";
-                uoaaTakenCheckbox.required = true;
-            } else {
-                takeTheCourseDiv.style.display = "none";
-                uoaaTakenCheckbox.required = false;
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('profile-picture-preview');
+                output.src = reader.result;
+                output.style.display = 'block';
             }
+            reader.readAsDataURL(event.target.files[0]);
         }
 
-        // Set initial state on page load
-        toggleTakeTheCourse();
+        document.addEventListener("DOMContentLoaded", function () {
+            const roleSelect = document.getElementById("id_teamhope_member_role");
+            const takeTheCourseDiv = document.getElementById("take_the_course");
+            const uoaaTakenCheckbox = document.getElementById("id_uoaa_taken");
 
-        // Update whenever the selected option changes
-        roleSelect.addEventListener("change", toggleTakeTheCourse);
-    });
-</script>
+            function toggleTakeTheCourse() {
+                if (roleSelect.value === "Volunteer") {
+                    takeTheCourseDiv.style.display = "block";
+                    uoaaTakenCheckbox.required = true;
+                } else {
+                    takeTheCourseDiv.style.display = "none";
+                    uoaaTakenCheckbox.required = false;
+                }
+            }
+
+            // Set initial state on page load
+            toggleTakeTheCourse();
+
+            // Update whenever the selected option changes
+            roleSelect.addEventListener("change", toggleTakeTheCourse);
+        });
+    </script>
 {% endblock content %}

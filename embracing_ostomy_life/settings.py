@@ -38,6 +38,10 @@ COMET_REST_API_KEY = os.getenv("COMET_REST_API_KEY")
 COMET_REGION = os.getenv("COMET_REGION")
 DEPLOYENV = os.getenv("DEPLOYENV")
 
+AZURE_ACCOUNT_NAME = env("AZURE_STORAGE_ACCOUNT_NAME")
+AZURE_ACCOUNT_KEY = env("AZURE_STORAGE_ACCOUNT_KEY")
+AZURE_CONTAINER = env("AZURE_STORAGE_CONTAINER_NAME")
+AZURE_CUSTOM_DOMAIN = f"{AZURE_ACCOUNT_NAME}.blob.core.windows.net"
 AZURE_B2C_CLIENT_ID = os.getenv("AZURE_B2C_CLIENT_ID")
 AZURE_B2C_CLIENT_SECRET = os.getenv("AZURE_B2C_CLIENT_SECRET")
 AZURE_B2C_TENANT = os.getenv("AZURE_B2C_TENANT")
@@ -103,6 +107,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "storages",
     "team_hope",
     # 'allauth.socialaccount.providers.azure',#
 ]
@@ -167,9 +172,20 @@ TEMPLATES = [
         },
     },
 ]
-
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, "templates"),
+    "ream_hope/templates",
+)
+MEDIA_URL = f"{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/"
 WSGI_APPLICATION = "embracing_ostomy_life.wsgi.application"
-
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -205,7 +221,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "apikey")
 EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL","admin@embracingostomylife.org")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "admin@embracingostomylife.org")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -233,15 +249,6 @@ CACHES = {
         },
     }
 }
-# CACHES = {
-#         "default": {
-#             "BACKEND": "django_redis.cache.RedisCache",
-#             "LOCATION": os.environ.get('CACHELOCATION'),
-#             "OPTIONS": {
-#                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         },
-#     }
-# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -256,7 +263,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-
 STATICFILES_DIRS = (str(BASE_DIR.joinpath("static")),)
 STATIC_URL = "static/"
 
@@ -275,6 +281,10 @@ LOGGING = {
             "level": env("DJANGO_LOG_LEVEL"),
             "formatter": "verbose",
         },
+        "null": {
+            "level": "DEBUG",
+            "class": "logging.NullHandler",
+        },
         "console": {
             "class": "logging.StreamHandler",
             "level": env("DJANGO_LOG_LEVEL"),
@@ -283,11 +293,15 @@ LOGGING = {
 
     },
     "loggers": {
-        "team_hope": {
+        "": {
             "level": env("DJANGO_LOG_LEVEL"),
             "handlers": ["file", "console"],
             "propagate": True,
-        }
+        },
+        "django.db.backends": {"handlers": ["null"], "level": "CRITICAL"},
+        "django_components": {"handlers": ["null"], "level": "CRITICAL"},
+        "django.utils.autoreload": {"handlers": ["null"], "level": "CRITICAL"},
+
     },
     "formatters": {
         "verbose": {

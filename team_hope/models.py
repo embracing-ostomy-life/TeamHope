@@ -1,8 +1,8 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
+from datetime import date
+
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
-from datetime import date
 
 
 class UserType(models.TextChoices):
@@ -114,7 +114,7 @@ class UserProfile(models.Model):
         default=UserType.SUPPORTER,
     )
     profile_picture = models.ImageField(
-        upload_to="profile_pictures/", null=True, blank=True
+        upload_to="", null=True, blank=True
     )
     surgery_date = models.DateField(null=True, blank=True)
     surgery_type = models.CharField(
@@ -168,7 +168,6 @@ class UserProfile(models.Model):
     registration_complete = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-
         self.team_hope_all_complete = all(
             [
                 self.team_hope_docusign_complete,

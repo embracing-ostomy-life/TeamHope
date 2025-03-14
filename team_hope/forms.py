@@ -1,16 +1,15 @@
+import datetime
+
 from django import forms
+from django.utils.safestring import mark_safe
+
 from .models import (
     UserProfile,
-    UserType,
     OstomateType,
     RelationshipStatus,
     TeamHopeMemberRoleChoices,
     PrimaryLanguageChoices,
-    EthnicityChoices,
 )
-from django import forms
-from django.utils.safestring import mark_safe
-import datetime
 
 
 class RegisterForm(forms.ModelForm):
@@ -105,6 +104,18 @@ class RegisterTeamHopeForm(forms.ModelForm):
         required=True,
         label="Primary Language",
     )
+    profile_picture = forms.FileField(
+        label="Profile Picture(Optional)",
+        widget=forms.FileInput(
+            attrs={
+                "class": "form-control",
+                "onchange": "previewImage(this)",
+                "name": "profile_picture",
+                "id": "profile_picture",
+            }
+        ),
+        required=False
+    )
 
     class Meta:
         model = UserProfile
@@ -185,6 +196,7 @@ class ProfileForm(forms.ModelForm):
             "relationship_status",
             "country",
             "state_province",
+            "profile_picture",
             "primary_language",
             "secondary_language",
             "hobbies",
@@ -223,6 +235,13 @@ class ProfileForm(forms.ModelForm):
             "subscribed_to_aliveandkicking": forms.CheckboxInput(
                 attrs={"class": "form-check-input"}
             ),
+            "profile_picture": forms.FileField(
+                label="Profile Picture(Optional)",
+                widget=forms.FileInput(
+                    attrs={"class": "form-control"}
+                ),
+                required=False
+            )
         }
 
     def clean(self):
