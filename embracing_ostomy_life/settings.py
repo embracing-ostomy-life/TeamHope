@@ -83,6 +83,7 @@ LOGOUT_REDIRECT_URL = "/"  # AZURE_B2C_LOGOUT_URL
 
 ALLOWED_HOSTS = [
     "169.254.131.3",
+    "169.254.129.5",
     "localhost:8000",
     "localhost",
     "app.embracingostomylife.org",
