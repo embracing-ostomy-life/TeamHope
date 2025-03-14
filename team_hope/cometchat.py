@@ -117,8 +117,7 @@ class CCUser:
             return self.update()
 
     def create(self):
-        params = self._get_uid_param()
-        self._add_name_param(params)
+        params = self._gen_params()
         logging.debug(f"Creating CometChat user with params {str(params)}")
         logging.debug(f"Using URL {self.url} And headers {str(json_headers)}")
         response = requests.post(self.url, json=params, headers=json_headers)
@@ -138,29 +137,25 @@ class CCUser:
         logging.debug(f"Update returned status code: ({str(response.status_code)})\n And text {response.text}")
         return response.json().get("data")
 
-    def _get_uid_param(self):
-        identity_info = UserIdentityInfo.objects.get(user=self.django_user)
-        if identity_info.uuid is not None:
-            return {"uid": identity_info.uuid}
-        return None
-
     def _add_name_param(self, params: dict):
         if self.django_user.username is not None:
             params["name"] = f"{self.django_user.first_name.capitalize()} {self.django_user.last_name.capitalize()}"
 
     def _gen_params(self):
         user = self.django_user
-        my_params = {}
+        identity_info = UserIdentityInfo.objects.get(user=user)
+        params = {}
+        if identity_info.uuid is not None:
+            params["uuid"] = identity_info.uuid
         metadata = {}
-        params = self._get_uid_param()
         self._add_name_param(params)
         if user.email is not None:
             _metadata_params_add(metadata, "email", user.email)
-            my_params["metadata"] = metadata
+            params["metadata"] = metadata
         try:
             profile = UserProfile.objects.get(user=user)
             if profile.profile_picture:
-                my_params["avatar"] = profile.profile_picture.url
+                params["avatar"] = profile.profile_picture.url
         except UserProfile.DoesNotExist:
             pass  # There is no user profile associated with the user
         return params
