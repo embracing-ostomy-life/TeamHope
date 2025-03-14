@@ -1,63 +1,49 @@
 import logging
 import os
 import secrets
+from io import BytesIO
 
 from PIL import Image
-from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
-PICTURE_WIDTH = 200
-PICTURE_HEIGHT = 200
+PICTURE_WIDTH = 100
+PICTURE_HEIGHT = 100
 
 # Create the logger
 logger = logging.getLogger(__name__)
 
 
-def validate_picture_format(form, field):
+def process_profile_picture(image_file, dimensions=None):
     """
-    Validates the file provided for picture is in any one of the acceptable
-    picture formats
-    Args:
-        form (str) : the picture string to be validated
-        field (str) : the picture string to be validated
 
-    Returns:
-        bool : True if valid False otherwise
-    Raises:
-        ValidationError : If the picture file extension is not in the allowed extensions list
     """
-    picture_extensions = [".png", ".jpeg", ".jpg", ".gif", ".psd", ".tiff"]
-    _, ext = os.path.splitext(field.data.filename)
+    picture_extensions = [".png", ".jpeg", ".jpg", ".svg"]
+    _, ext = os.path.splitext(image_file.name)
+
     if ext.lower() not in picture_extensions:
         logger.error(f"Wrong Picture extension! Allowed extensions are: {picture_extensions}")
         raise ValidationError(
             f"Wrong Picture extension! Allowed extensions are: {picture_extensions}"
         )
-    return True
-
-
-def save_picture_by_dimensions(form_picture, dimensions=None):
-    """
-    Gives a picture location a random hex filename and saves it in the database
-
-    Args:
-        form_picture(str) : The representation of the picture
-        dimensions (tuple) : The width and height of the picture
-
-    Returns:
-        str : the location of the photo to be added to the database
-    """
     if not dimensions:
         dimensions = (PICTURE_WIDTH, PICTURE_HEIGHT)
-    _, ext = os.path.splitext(form_picture.filename)
     filename = f"{secrets.token_hex(8)}{ext.lower()}"
 
-    picture_full_path = os.path.join(settings.BASE_DIR, "static", "images", filename)
     try:
-        image = Image.open(form_picture)
-        image.thumbnail(size=dimensions)
-        image.save(picture_full_path)
-
+        thumb = Image.open(image_file)
+        thumb.thumbnail(size=dimensions)
+        thumb_io = BytesIO()
+        thumb.save(thumb_io, format="JPEG")
+        thumb_file = InMemoryUploadedFile(
+            file=thumb_io,
+            field_name=None,
+            name=filename,
+            content_type=image_file.content_type,
+            size=dimensions,
+            charset=None
+        )
+        return thumb_file
     except FileNotFoundError:
-        filename = "default.png"
-    return filename
+        logger.error(f"Picture file not found: {image_file}")
+        return None

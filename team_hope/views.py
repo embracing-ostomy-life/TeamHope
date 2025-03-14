@@ -44,6 +44,7 @@ from .forms import (
 )
 from .helpers.docusign_email_sender import DocuSignEmailSender
 from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
+from .utils.picture_utils import process_profile_picture
 
 # Create a logger
 logger = logging.getLogger(__name__)  # The name resolves to team_hope.views
@@ -342,9 +343,11 @@ def register_team_hope(request):
     if request.method == "POST":
         form = RegisterTeamHopeForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            logging.debug(form.cleaned_data)
-            filename = request.FILES.get("profile_picture")
+            image_file = form.cleaned_data.get("profile_picture")
             profile = form.save(commit=False)
+        
+            if image_file:
+                profile.profile_picture = process_profile_picture(image_file)
             profile.team_hope_docusign_complete = False
             profile.team_hope_training_complete = True
             profile.team_hope_all_complete = True
