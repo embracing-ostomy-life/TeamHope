@@ -4,8 +4,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from .models import UserIdentityInfo
-from .models import UserProfile
+from .models import UserIdentityInfo, UserProfile
 
 REST_API_KEY = settings.COMET_REST_API_KEY
 REGION = settings.COMET_REGION
@@ -117,7 +116,9 @@ class CCUser:
             return self.update()
 
     def create(self):
-        params = self._gen_params()
+        params = self._get_uid_param()
+        self._add_name_param(params)
+        self._add_profile_picture(params)
         logging.debug(f"Creating CometChat user with params {str(params)}")
         logging.debug(f"Using URL {self.url} And headers {str(json_headers)}")
         response = requests.post(self.url, json=params, headers=json_headers)
@@ -130,6 +131,7 @@ class CCUser:
     def update(self):
         params = self._gen_params()
         identity_info = UserIdentityInfo.objects.get(user=self.django_user)
+        self._add_profile_picture(params)
         url = self.url + "/" + identity_info.uuid
         logging.debug(f"Updating CometChat user with params {str(params)}")
         logging.debug(f"Using Url ({url}) And headers: ({str(json_headers)})")
@@ -137,23 +139,33 @@ class CCUser:
         logging.debug(f"Update returned status code: ({str(response.status_code)})\n And text {response.text}")
         return response.json().get("data")
 
+    def _get_uid_param(self):
+        identity_info = UserIdentityInfo.objects.get(user=self.django_user)
+        if identity_info.uuid is not None:
+            return {"uid": identity_info.uuid}
+        return None
+
     def _add_name_param(self, params: dict):
         if self.django_user.username is not None:
             params["name"] = f"{self.django_user.first_name.capitalize()} {self.django_user.last_name.capitalize()}"
 
     def _gen_params(self):
         user = self.django_user
-        identity_info = UserIdentityInfo.objects.get(user=user)
-        params = {}
-        if identity_info.uuid is not None:
-            params["uuid"] = identity_info.uuid
+        my_params = {}
         metadata = {}
+        params = self._get_uid_param()
         self._add_name_param(params)
         if user.email is not None:
             _metadata_params_add(metadata, "email", user.email)
-            params["metadata"] = metadata
+            my_params["metadata"] = metadata
+        return params
+
+    def _add_profile_picture(self, params: dict):
+        """
+        Update the parameters with an avatar if the profile has a profile picture
+        """
         try:
-            profile = UserProfile.objects.get(user=user)
+            profile = UserProfile.objects.get(user=self.django_user)
             if profile.profile_picture:
                 params["avatar"] = profile.profile_picture.url
         except UserProfile.DoesNotExist:
