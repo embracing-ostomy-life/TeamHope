@@ -196,25 +196,25 @@ STORAGES = {
 
 # Configure Postgres database for local development
 #   Set these environment variables in the .env file for this project.
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.environ.get("DBNAME"),
-#         "HOST": os.environ.get("DBHOST"),
-#         "USER": os.environ.get("DBUSER"),
-#         "PASSWORD": os.environ.get("DBPASS"),
-#     }
-# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # os.environ.get('DBNAME'),
-        'HOST': 'localhost',  # os.environ.get('DBHOST'),
-        'PORT': '5431',  # os.environ.get('DBPORT'),
-        'USER': 'postgres',  # os.environ.get('DBUSER'),
-        'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DBNAME"),
+        "HOST": os.environ.get("DBHOST"),
+        "USER": os.environ.get("DBUSER"),
+        "PASSWORD": os.environ.get("DBPASS"),
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',  # os.environ.get('DBNAME'),
+#         'HOST': 'localhost',  # os.environ.get('DBHOST'),
+#         'PORT': '5431',  # os.environ.get('DBPORT'),
+#         'USER': 'postgres',  # os.environ.get('DBUSER'),
+#         'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
+#     }
+# }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"
