@@ -15,7 +15,6 @@ from pathlib import Path
 
 import environ
 
-DEBUG = True
 env = environ.Env(
     DEBUG=(bool, False)
 )
@@ -24,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Take environment variables from .env file
 environ.Env.read_env(BASE_DIR / '.env')
-
+DEBUG = os.environ.get("DEBUG", True)
 print("\n\n\n\nIn normal settings :)\n\n\n\n")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -108,6 +107,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "widget_tweaks",
     "storages",
     "team_hope",
     # 'allauth.socialaccount.providers.azure',#

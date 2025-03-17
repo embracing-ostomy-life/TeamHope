@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 {% load form_tags %}
 
 {% block header %}
@@ -39,8 +40,9 @@
                     </div>
                 </div>
                 <div class="col-md-12">
-                    {{ form.teamhope_member_role.label_tag }}
-                    {{ form.teamhope_member_role|add_class:"form-control" }}
+                    <label for="{{ form.teamhope_member_role.id_for_label }}"
+                           class="form-label">{{ form.teamhope_member_role.label_tag }}</label>
+                    {{ form.teamhope_member_role }}
                 </div>
             </div>
 
