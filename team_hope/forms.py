@@ -63,9 +63,9 @@ class RegisterTeamHopeForm(forms.ModelForm):
 
     teamhope_member_role = forms.ChoiceField(
         choices=TeamHopeMemberRoleChoices.choices,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "form-select form-select-lg "}),
         required=True,
-        label="Team HOPE",
+        label="Select Your Team HOPE Role",
     )
 
     hobbies = forms.CharField(
