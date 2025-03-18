@@ -345,9 +345,13 @@ def register_team_hope(request):
         if form.is_valid():
             image_file = form.cleaned_data.get("profile_picture")
             profile = form.save(commit=False)
-        
+
             if image_file:
-                profile.profile_picture = process_profile_picture(image_file)
+                try:
+                    profile.profile_picture = process_profile_picture(image_file)
+                except Exception as error:
+                    logging.error(f"Failed to process Profile Picture: {error}")
+                    profile.profile_picture = None
             profile.team_hope_docusign_complete = False
             profile.team_hope_training_complete = True
             profile.team_hope_all_complete = True
