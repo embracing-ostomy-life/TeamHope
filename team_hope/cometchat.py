@@ -85,9 +85,12 @@ def _sendmsg():
 
 
 def _metadata_params_add(params: dict, key, value):
-    if params == {}:
+    if params is None:
+        params = {}
+    if not params:
         params["@private"] = {}
     params["@private"][key] = value
+    return params
 
 
 class CCUser:
@@ -116,7 +119,7 @@ class CCUser:
             return self.update()
 
     def create(self):
-        params = self._get_uid_param()
+        params = self._gen_params()
         self._add_name_param(params)
         self._add_profile_picture(params)
         logging.debug(f"Creating CometChat user with params {str(params)}")
@@ -143,7 +146,7 @@ class CCUser:
         identity_info = UserIdentityInfo.objects.get(user=self.django_user)
         if identity_info.uuid is not None:
             return {"uid": identity_info.uuid}
-        return None
+        return {}
 
     def _add_name_param(self, params: dict):
         if self.django_user.username is not None:
@@ -151,13 +154,12 @@ class CCUser:
 
     def _gen_params(self):
         user = self.django_user
-        my_params = {}
-        metadata = {}
         params = self._get_uid_param()
-        self._add_name_param(params)
-        if user.email is not None:
+        if user and user.email is not None:
+            metadata = params.get("metadata", {})
+            self._add_name_param(params)
             _metadata_params_add(metadata, "email", user.email)
-            my_params["metadata"] = metadata
+            params["metadata"] = metadata
         return params
 
     def _add_profile_picture(self, params: dict):
