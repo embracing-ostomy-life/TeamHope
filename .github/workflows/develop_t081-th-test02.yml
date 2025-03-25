@@ -77,5 +77,5 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 't081-th-test02'
-          slot-name: 'Production'
+          slot-name: 'Staging'
           
