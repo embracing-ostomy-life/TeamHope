@@ -413,7 +413,7 @@ def schedule_sendgrid_subscription(email, surgery_date):
 
 def register_alive_and_kicking(request):
     if not request.user.is_authenticated:
-        return redirect("team_home:azure_b2c_login")
+        return redirect("team_hope:azure_b2c_login")
 
     current_user = request.user
     profile = UserProfile.objects.get(user=current_user)
