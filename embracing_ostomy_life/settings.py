@@ -86,6 +86,9 @@ ALLOWED_HOSTS = [
     "localhost:8000",
     "localhost",
     "app.embracingostomylife.org",
+    "ab7f-24-224-206-20.ngrok-free.app",
+    "http://ab7f-24-224-206-20.ngrok-free.app"
+    "https://ab7f-24-224-206-20.ngrok-free.app"
 ]
 
 if "CODESPACE_NAME" in os.environ:
@@ -205,16 +208,16 @@ DATABASES = {
         "PASSWORD": os.environ.get("DBPASS"),
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',  # os.environ.get('DBNAME'),
-#         'HOST': 'localhost',  # os.environ.get('DBHOST'),
-#         'PORT': '5431',  # os.environ.get('DBPORT'),
-#         'USER': 'postgres',  # os.environ.get('DBUSER'),
-#         'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # os.environ.get('DBNAME'),
+        'HOST': 'localhost',  # os.environ.get('DBHOST'),
+        'PORT': '5431',  # os.environ.get('DBPORT'),jhh
+        'USER': 'postgres',  # os.environ.get('DBUSER'),
+        'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
+    }
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"

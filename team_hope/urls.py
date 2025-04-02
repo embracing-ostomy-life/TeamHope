@@ -69,4 +69,5 @@ urlpatterns = [
         name="unsubscribe_teamhope",
     ),  # Add this line
     path("docusign/webhook", views.docusign_webhook, name="docusign_webhook"),
+    path("cometchat/webhook", views.cometchat_webhook, name="cometchat_webhook"),
 ]
