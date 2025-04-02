@@ -208,7 +208,7 @@ def docusign_webhook(request):
                 logging.info(f"Found User {profile}")
                 if profile.docusign_aliveandkicking_envelope_id == envelope_id:
                     profile.aliveandkicking_waiver_complete = True
-                else:
+                elif profile.docusign_teamhope_envelope_id == envelope_id:
                     profile.team_hope_docusign_complete = True
 
                     # Only after signing the team hope docusing should the user be added to cometchat
@@ -220,9 +220,10 @@ def docusign_webhook(request):
                             # The profile is being created or updated
                             # either way, the profile can be marked as complete
                             profile.registration_complete = True
-                        if "createdAt" in resp and not "updatedAt" in resp:
+                        if "createdAt" in resp and "updatedAt" not in resp:
                             # Send email to chat admins
                             send_cometchat_admins_new_person_alert_email(profile)
+
                     except Exception as error:
                         logging.error(f"Failed to sync CometChat user: {error}")
                 profile.save()
@@ -353,8 +354,8 @@ def register_team_hope(request):
                     logging.error(f"Failed to process Profile Picture: {error}")
                     profile.profile_picture = None
             profile.team_hope_docusign_complete = False
-            profile.team_hope_training_complete = True
-            profile.team_hope_all_complete = True
+            profile.team_hope_training_complete = False
+            profile.team_hope_all_complete = False
             docusign = DocuSignEmailSender()
             if profile.teamhope_member_role == TeamHopeMemberRoleChoices.PARTICIPANT:
                 template_id = settings.DS_TEAM_HOPE_MEMBER_TEMPLATE_ID
