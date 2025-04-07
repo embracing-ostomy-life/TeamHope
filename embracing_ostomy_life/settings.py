@@ -20,10 +20,9 @@ env = environ.Env(
 )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEBUG = os.environ.get("DEBUG", False)
 # Take environment variables from .env file
 environ.Env.read_env(BASE_DIR / '.env')
-DEBUG = os.environ.get("DEBUG", True)
+
 print("\n\n\n\nIn normal settings :)\n\n\n\n")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
