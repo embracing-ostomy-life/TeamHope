@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 
 import jwt
+import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -17,8 +18,8 @@ from django.contrib.auth.views import LogoutView
 from django.db.models import Q
 from django.http import (
     HttpResponse,
-    HttpResponseRedirect,
     JsonResponse,
+    HttpResponseRedirect,
     HttpResponseBadRequest,
 )
 from django.shortcuts import redirect
@@ -45,9 +46,12 @@ from .forms import (
 from .helpers.docusign_email_sender import DocuSignEmailSender
 from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
 from .utils.picture_utils import process_profile_picture
+from .utils.send_bulk_emails import notify_users_of_chat
 
 # Create a logger
 logger = logging.getLogger(__name__)  # The name resolves to team_hope.views
+
+SENDGRID_API_KEY = settings.SENDGRID_API_KEY
 
 
 def azure_b2c_login(request):
@@ -125,7 +129,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "profile/edit_profile.html"
     success_url = "/profile/"
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return self.request.user.userprofile
 
 
@@ -135,7 +139,7 @@ class ProfilePictureUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "profile/edit_profile_picture.html"
     success_url = "/profile/"
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return self.request.user.userprofile
 
 
@@ -192,7 +196,7 @@ def docusign_webhook(request):
         return HttpResponseBadRequest("Invalid HMAC signature")
 
     # Process the payload (customize as per your requirements)
-    logging.debug("Webhook received:", payload_data)
+    logging.debug(f"Webhook received: {payload_data}", )
 
     if "data" in payload_data and "envelopeId" in payload_data["data"]:
         # search the user by envelopeId
@@ -299,7 +303,6 @@ def home(request):
 
 
 def index(request):
-    logger.info("Testing the logger")
     if request.user.is_authenticated:
         return redirect("team_hope:home")
     return redirect("team_hope:azure_b2c_login")
@@ -577,3 +580,54 @@ def chat(request):
         return render(request, "team_hope/chat.html", params)
 
     return redirect("team_hope:home")
+
+
+@csrf_exempt
+def cometchat_webhook(request):  # TODO in the future, we want to use all the fields in the email
+    if request.method == "POST":
+        data = json.loads(request.body).get("data")
+        subject = "You've Got a New Message on Team HOPE"
+        if data:
+            # Extract message details
+            try:
+                sender_details = data["message"]["data"]["entities"]["sender"]["entity"]
+                sender_name = sender_details["name"]
+                sender_email = sender_details["metadata"]["@private"]["email"]
+                sender_role = sender_details["role"]
+                receiver_details = data["message"]["data"]["entities"]["receiver"]["entity"]
+                receiver_type = data["message"]["data"]["entities"]["receiver"]["entityType"]
+                sent_at = data["message"]["sentAt"]
+                category = data["message"]["category"]
+                group_id = None
+                if receiver_type == "group":
+                    group_id = receiver_details["guid"]
+                    group_name = receiver_details["name"]
+                    # get all the member emails from the group
+                    group_url = (
+                        f"https://{settings.COMET_APP_ID}.api-{settings.COMET_REGION}."
+                        f"cometchat.io/v3/groups/{group_id}/members?perPage=100&page=1"
+                    )
+                    headers = {
+                        "accept": "application/json",
+                        "apikey": settings.COMET_REST_API_KEY,
+                    }
+
+                    resp = requests.get(group_url, headers=headers)
+                    users = resp.json().get("data", [])
+                    # Retrieve the members of the group for email
+                    user_details = [
+                        {"email": user.get("metadata", {}).get("@private", {}).get("email"),
+                         "name": user.get("name"),
+                         }
+                        for user in users if user.get("metadata", {}).get("@private", {}).get("email")
+                    ] if users else []
+                    # send the email to the recipients in the group
+                    notify_users_of_chat(recipients=user_details)
+
+            except (KeyError, Exception) as error:
+                logger.error(f"Failed to Generate message data due to : {error}")
+                return {}
+
+        return JsonResponse({"status": "success"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
