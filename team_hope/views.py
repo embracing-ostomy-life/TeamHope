@@ -46,7 +46,7 @@ from .forms import (
 from .helpers.docusign_email_sender import DocuSignEmailSender
 from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
 from .utils.picture_utils import process_profile_picture
-from .utils.send_bulk_emails import send_bulk_emails_with_sendgrid
+from .utils.send_bulk_emails import notify_users_of_chat
 
 # Create a logger
 logger = logging.getLogger(__name__)  # The name resolves to team_hope.views
@@ -582,10 +582,8 @@ def chat(request):
     return redirect("team_hope:home")
 
 
-#################################################################################
-
 @csrf_exempt
-def cometchat_webhook(request):
+def cometchat_webhook(request):  # TODO in the future, we want to use all the fields in the email
     if request.method == "POST":
         data = json.loads(request.body).get("data")
         subject = "You've Got a New Message on Team HOPE"
@@ -624,10 +622,8 @@ def cometchat_webhook(request):
                         for user in users if user.get("metadata", {}).get("@private", {}).get("email")
                     ] if users else []
                     # send the email to the recipients in the group
-                    resp = send_bulk_emails_with_sendgrid(recipients=user_details, subject=subject)
-                    logger.debug("**************************************************************")
-                    logger.debug(resp)
-                    logger.debug("**************************************************************")
+                    notify_users_of_chat(recipients=user_details)
+
             except (KeyError, Exception) as error:
                 logger.error(f"Failed to Generate message data due to : {error}")
                 return {}
