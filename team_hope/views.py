@@ -619,7 +619,9 @@ def cometchat_webhook(request):  # TODO in the future, we want to use all the fi
                         {"email": user.get("metadata", {}).get("@private", {}).get("email"),
                          "name": user.get("name"),
                          }
-                        for user in users if user.get("metadata", {}).get("@private", {}).get("email")
+                        for user in users if
+                        user.get("metadata", {}).get("@private", {}).get("email") and
+                        user.get("metadata", {}).get("@private", {}).get("email") != sender_email
                     ] if users else []
                     # send the email to the recipients in the group
                     notify_users_of_chat(recipients=user_details)

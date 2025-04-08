@@ -171,5 +171,5 @@ class CCUser:
             if profile.profile_picture:
                 params["avatar"] = profile.profile_picture.url
         except UserProfile.DoesNotExist:
-            pass  # There is no user profile associated with the user
+            logger.warning(f"Theres no user associated with this profile: {self.django_user}")
         return params
