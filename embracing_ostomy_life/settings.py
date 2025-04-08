@@ -20,6 +20,7 @@ env = environ.Env(
 )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+DEBUG = True
 # Take environment variables from .env file
 environ.Env.read_env(BASE_DIR / '.env')
 
@@ -85,9 +86,6 @@ ALLOWED_HOSTS = [
     "localhost:8000",
     "localhost",
     "app.embracingostomylife.org",
-    "ab7f-24-224-206-20.ngrok-free.app",
-    "http://ab7f-24-224-206-20.ngrok-free.app"
-    "https://ab7f-24-224-206-20.ngrok-free.app"
 ]
 
 if "CODESPACE_NAME" in os.environ:
