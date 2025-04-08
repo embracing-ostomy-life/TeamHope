@@ -625,7 +625,7 @@ def cometchat_webhook(request):  # TODO in the future, we want to use all the fi
                     ] if users else []
                     # send the email to the recipients in the group
                     logger.debug("**************************************************************")
-                    logger.debug)(f"Sending emails to :{user_details}\n From: {sender_email}")
+                    logger.debug(f"Sending emails to :{user_details}\n From: {sender_email}")
                     logger.debug("**************************************************************")
                     notify_users_of_chat(recipients=user_details)
 
