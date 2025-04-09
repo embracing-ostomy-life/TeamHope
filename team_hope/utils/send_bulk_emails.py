@@ -59,29 +59,36 @@ logger = logging.getLogger(__name__)  # This will resolve to team_hope.utils.sen
 #         return False
 
 
-def notify_users_of_chat(recipients: list):
+def notify_users_of_chat(recipients: list, subject=None):
     """
-    Once a user has completed the team hope docusing, an email is sent out to the
-    cometchat admins.
-     ["patti@embracingostomylife.org - Patti McCord","margaret@embracingostomylife.org - Margaret Cypher"]
+   Once a group participant sends a message in the group, the other participants of the group
+   should get an email notification of this.
 
     Args:
+        subject (str):
         recipients: list of name,email key-value pairs
-
 
     Returns:
         None
+    Raises:
+        Exception : Whenever sending the email fails
     """
-    subject = "You've Got a New Message on Team HOPE"
+    subject = "You've Got a New Message on Team HOPE" if subject is None else subject
 
     try:
         for recipient in recipients:
-            context = {"email": recipient["email"], "name": recipient["name"],
-                       "link": "https://app.embracingostomylife.org/chat"}
+            context = {
+                "email": recipient["email"],
+                "name": recipient["name"],
+                "link": "https://app.embracingostomylife.org/chat"
+            }
             html_message = render_to_string(
                 "email_templates/chat_notification.html", context
             )
             plain_msg = strip_tags(html_message)
+            logger.debug("----------------------------------------------------------------")
+            logger.debug(f"sending email to : {recipient['email']}")
+            logger.debug("----------------------------------------------------------------")
             email = EmailMultiAlternatives(
                 subject,
                 plain_msg,
@@ -89,7 +96,8 @@ def notify_users_of_chat(recipients: list):
                 [recipient["email"]],
             )
             email.attach_alternative(html_message, "text/html")
-            email.send()
+            sent = email.send()
+            logger.debug(f"sent email to : {recipient['email']} with response: {sent}")
     except Exception as e:
         logging.error(f"Failed  sending email to {recipients}:FROM {settings.DEFAULT_FROM_EMAIL}  Because: {e}")
         return False
