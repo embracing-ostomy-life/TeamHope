@@ -107,6 +107,7 @@ class CCUser:
         response = requests.get(url, headers=default_headers)
         logging.debug(f"Get returned status code {str(response.status_code)}")
         if response.status_code != 200:
+            # User was not found in comet chat
             return None
         return response.json().get("data")
 
