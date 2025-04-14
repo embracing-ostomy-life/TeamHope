@@ -357,8 +357,8 @@ def register_team_hope(request):
                     logging.error(f"Failed to process Profile Picture: {error}")
                     profile.profile_picture = None
             profile.team_hope_docusign_complete = False
-            profile.team_hope_training_complete = False
-            profile.team_hope_all_complete = False
+            profile.team_hope_training_complete = True
+            profile.team_hope_all_complete = True
             docusign = DocuSignEmailSender()
             if profile.teamhope_member_role == TeamHopeMemberRoleChoices.PARTICIPANT:
                 template_id = settings.DS_TEAM_HOPE_MEMBER_TEMPLATE_ID
@@ -624,9 +624,7 @@ def cometchat_webhook(request):  # TODO in the future, we want to use all the fi
                         user.get("metadata", {}).get("@private", {}).get("email") != sender_email
                     ] if users else []
                     # send the email to the recipients in the group
-                    logger.debug("**************************************************************")
                     logger.debug(f"Sending emails to :{user_details}\n From: {sender_email}")
-                    logger.debug("**************************************************************")
                     notify_users_of_chat(recipients=user_details)
 
             except (KeyError, Exception) as error:

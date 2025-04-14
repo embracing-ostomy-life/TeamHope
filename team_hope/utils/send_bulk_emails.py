@@ -86,9 +86,6 @@ def notify_users_of_chat(recipients: list, subject=None):
                 "email_templates/chat_notification.html", context
             )
             plain_msg = strip_tags(html_message)
-            logger.debug("----------------------------------------------------------------")
-            logger.debug(f"sending email to : {recipient['email']}")
-            logger.debug("----------------------------------------------------------------")
             email = EmailMultiAlternatives(
                 subject,
                 plain_msg,
