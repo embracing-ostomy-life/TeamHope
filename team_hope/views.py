@@ -211,9 +211,11 @@ def docusign_webhook(request):
             if profile:
                 logging.info(f"Found User {profile}")
                 if profile.docusign_aliveandkicking_envelope_id == envelope_id:
+                    profile.subscribed_to_aliveandkicking = True
                     profile.aliveandkicking_waiver_complete = True
                 elif profile.docusign_teamhope_envelope_id == envelope_id:
                     profile.team_hope_docusign_complete = True
+                    profile.subscribed_to_teamhope = True
 
                     # Only after signing the team hope docusing should the user be added to cometchat
                     try:
@@ -230,6 +232,7 @@ def docusign_webhook(request):
 
                     except Exception as error:
                         logging.error(f"Failed to sync CometChat user: {error}")
+
                 profile.save()
             else:
                 raise UserProfile.DoesNotExist
