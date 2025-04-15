@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -8,7 +10,10 @@ from team_hope.utils.email_utils import (
 )
 from .models import UserProfile
 
+logger = logging.getLogger(__name__)
 
+
+@receiver(post_save, sender=User)
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -29,6 +34,8 @@ def send_team_hope_welcome(sender, instance, **kwargs):
 
 @receiver(post_save, sender=UserProfile)
 def send_aliveandkicking_welcome(sender, instance, **kwargs):
+    logger.info(f"Instance subscribed to Alive and Kicking:{instance.subscribed_to_aliveandkicking} ")
+    logger.info(f"Instance Alive And Kicking Waiver: {instance.aliveandkicking_waiver_complete}")
     if (
             not instance.subscribed_to_aliveandkicking
             and instance.aliveandkicking_waiver_complete
