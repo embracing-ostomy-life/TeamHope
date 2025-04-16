@@ -76,7 +76,7 @@ MAILCHIMP_LIST_ID = os.getenv("MAILCHIMP_LIST_ID")
 
 
 # settings.py
-
+LOGIN_URL = "/"  # os.getenv("LOGIN_URL")
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"  # AZURE_B2C_LOGOUT_URL
 
@@ -205,6 +205,7 @@ DATABASES = {
         "PASSWORD": os.environ.get("DBPASS"),
     }
 }
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
