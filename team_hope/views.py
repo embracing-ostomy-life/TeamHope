@@ -592,9 +592,6 @@ def chat(request):
 def cometchat_webhook(request):  # TODO in the future, we want to use all the fields in the email
     if request.method == "POST":
         data = json.loads(request.body).get("data")
-        logger.info("****************************************************************")
-        logger.info(data)
-        logger.info("****************************************************************")
         if data:
             # Extract message details
             try:

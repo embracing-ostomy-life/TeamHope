@@ -1,7 +1,10 @@
 from django.contrib import admin
+
 from .models import UserProfile, UserIdentityInfo
 
 admin.site.register(UserIdentityInfo)
+
+
 # Register your models here.
 
 
@@ -9,8 +12,13 @@ admin.site.register(UserIdentityInfo)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "get_date_joined",
         "get_first_name",
         "get_last_name",
+        "subscribed_to_aliveandkicking",
+        "aliveandkicking_waiver_complete",
+        "team_hope_docusign_complete",
+        "team_hope_training_complete",
         "teamhope_member_role",
         "surgery_type",
         "surgery_date",
@@ -20,11 +28,11 @@ class UserProfileAdmin(admin.ModelAdmin):
         "primary_language",
         "hobbies",
         "bio",
-        "team_hope_docusign_complete",
-        "team_hope_training_complete",
+
     )
     list_filter = (
         "teamhope_member_role",
+        "user__date_joined",
         "surgery_date",
         "surgery_type",
         "age",
@@ -45,6 +53,20 @@ class UserProfileAdmin(admin.ModelAdmin):
 
     def get_first_name(self, obj):
         return obj.user.first_name
+
+    def get_date_joined(self, obj):
+        """
+        Return the date that the user first joined the application by signing up
+        Args:
+            obj(UserProfile): The user profile to get the date joined from
+
+        Returns:
+            object: The date that the user first joined the application by signing up
+        """
+        return obj.user.date_joined.date()
+
+    get_date_joined.admin_order_field = "user__date_joined"  # Enables the field to be ordered in admin page
+    get_date_joined.short_description = "Date joined"
 
     get_first_name.admin_order_field = "user__first_name"
     get_first_name.short_description = "First Name"
