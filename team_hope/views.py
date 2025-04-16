@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
@@ -62,11 +63,11 @@ def azure_b2c_login(request):
 
 
 def azure_b2c_callback(request):
+    next_page = request.session.get("next", "/")
     token = request.GET.get("id_token")
     if not token:
         logger.error("Token with  was not found in the Response")
         return HttpResponse("Token not found in the response", status=400)
-
     try:
         jwks_url = f"https://{settings.AZURE_B2C_TENANT}.b2clogin.com/{settings.AZURE_B2C_TENANT}.onmicrosoft.com/{settings.AZURE_B2C_POLICY_NAME}/discovery/v2.0/keys"
         jwks_client = PyJWKClient(jwks_url)
@@ -110,7 +111,7 @@ def azure_b2c_callback(request):
             ccuser.sync()
 
         login(request, user)
-        return redirect("team_hope:home")
+        return redirect(f"{next_page}")
 
     except jwt.ExpiredSignatureError:
         logging.error("Token has expired")
@@ -254,6 +255,7 @@ def docusign_webhook(request):
     return JsonResponse({"message": "Webhook received successfully"}, status=200)
 
 
+@login_required
 def home(request):
     if not request.user.is_authenticated:
         return redirect("team_hope:azure_b2c_login")
@@ -304,6 +306,8 @@ def home(request):
 
 
 def index(request):
+    if request.GET.get("next"):
+        request.session["next"] = request.GET["next"]
     if request.user.is_authenticated:
         return redirect("team_hope:home")
     return redirect("team_hope:azure_b2c_login")
@@ -550,6 +554,7 @@ def register_confirm(request):
     return render(request, "team_hope/registration/confirm.html")
 
 
+@login_required
 def chat(request):
     if (
             not request.user.is_authenticated
@@ -587,7 +592,9 @@ def chat(request):
 def cometchat_webhook(request):  # TODO in the future, we want to use all the fields in the email
     if request.method == "POST":
         data = json.loads(request.body).get("data")
-        subject = "You've Got a New Message on Team HOPE"
+        logger.info("****************************************************************")
+        logger.info(data)
+        logger.info("****************************************************************")
         if data:
             # Extract message details
             try:
@@ -607,7 +614,7 @@ def cometchat_webhook(request):  # TODO in the future, we want to use all the fi
                     group_url = (
                         f"https://{settings.COMET_APP_ID}.api-{settings.COMET_REGION}."
                         f"cometchat.io/v3/groups/{group_id}/members?perPage=100&page=1"
-                    )
+                    )  # TODO page must be dynamic in cases where there are many  members
                     headers = {
                         "accept": "application/json",
                         "apikey": settings.COMET_REST_API_KEY,
