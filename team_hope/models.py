@@ -152,8 +152,8 @@ class UserProfile(models.Model):
     bio = models.TextField(null=True, blank=True)
     subscribed_to_email_updates = models.BooleanField(default=False)
     subscribed_to_aliveandkicking = models.BooleanField(default=False)
-    team_hope_docusign_complete = models.BooleanField(default=False)
-    team_hope_training_complete = models.BooleanField(default=False)
+    team_hope_docusign_complete = models.BooleanField(verbose_name="Team Hope Docusign", default=False)
+    team_hope_training_complete = models.BooleanField(verbose_name="Team Hope Training", default=False)
     team_hope_all_complete = models.BooleanField(default=False, editable=False)
     docusign_aliveandkicking_envelope_id = models.TextField(default="", editable=False)
     docusign_teamhope_envelope_id = models.TextField(default="", editable=False)
@@ -164,7 +164,7 @@ class UserProfile(models.Model):
         null=True,
         blank=True,
     )
-    aliveandkicking_waiver_complete = models.BooleanField(default=False)
+    aliveandkicking_waiver_complete = models.BooleanField(verbose_name="Alive And Kicking Waiver", default=False)
     registration_complete = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
