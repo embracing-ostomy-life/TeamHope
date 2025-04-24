@@ -4,7 +4,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from .models import UserIdentityInfo, UserProfile
+from .models import UserIdentityInfo, UserProfile, TeamHopeMemberRoleChoices
 
 REST_API_KEY = settings.COMET_REST_API_KEY
 REGION = settings.COMET_REGION
@@ -156,10 +156,15 @@ class CCUser:
     def _gen_params(self):
         user = self.django_user
         params = self._get_uid_param()
+        try:
+            role = UserProfile.objects.get(user=user).teamhope_member_role
+        except UserProfile.DoesNotExist:
+            role = TeamHopeMemberRoleChoices.PARTICIPANT
         if user and user.email is not None:
             metadata = params.get("metadata", {})
             self._add_name_param(params)
             _metadata_params_add(metadata, "email", user.email)
+            _metadata_params_add(metadata, "role", role)
             params["metadata"] = metadata
         return params
 
