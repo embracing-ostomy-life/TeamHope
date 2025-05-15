@@ -17,6 +17,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
 from django.db.models import Q
+from django.db.utils import IntegrityError
 from django.http import (
     HttpResponse,
     JsonResponse,
@@ -45,7 +46,9 @@ from .forms import (
     RegisterTeamHopeForm,
 )
 from .helpers.docusign_email_sender import DocuSignEmailSender
-from .models import UserProfile, UserIdentityInfo, UserType, TeamHopeMemberRoleChoices
+from .models import (
+    UserProfile, UserIdentityInfo, UserType, UserMethodOfCommunication, TeamHopeMemberRoleChoices
+)
 from .utils.picture_utils import process_profile_picture
 from .utils.send_bulk_emails import notify_users_of_chat
 
@@ -353,6 +356,31 @@ def register_team_hope(request):
         form = RegisterTeamHopeForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             image_file = form.cleaned_data.get("profile_picture")
+            communication_method = form.cleaned_data.pop("communication_method")
+            if communication_method:
+
+                try:
+                    if len(communication_method) == 1:
+                        _ = UserMethodOfCommunication.objects.create(
+                            user=current_user,
+                            communication_method=communication_method[0]
+                        )
+                    else:
+                        bulk = [
+                            UserMethodOfCommunication(
+                                user=current_user,
+                                communication_method=method
+                            )
+                            for method in communication_method
+                        ]
+                        UserMethodOfCommunication.objects.bulk_create(bulk)
+                    if form.data.get("phone-number"):
+                        profile.phone = form.data.get("phone-number")
+                except IntegrityError as error:
+                    logger.debug(error)
+                    logger.debug(f"Communication method: {communication_method} already exists")
+                except Exception:
+                    logger.debug("Exception occurred: During Communication method creation")
             profile = form.save(commit=False)
 
             if image_file:

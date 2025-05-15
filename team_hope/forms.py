@@ -8,7 +8,7 @@ from .models import (
     OstomateType,
     RelationshipStatus,
     TeamHopeMemberRoleChoices,
-    PrimaryLanguageChoices,
+    PrimaryLanguageChoices, CommunicationChoices,
 )
 
 
@@ -67,6 +67,11 @@ class RegisterTeamHopeForm(forms.ModelForm):
         required=True,
         label="Select Your Team HOPE Role",
     )
+    communication_method = forms.MultipleChoiceField(
+        choices=CommunicationChoices.choices,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
 
     hobbies = forms.CharField(
         widget=forms.Textarea(attrs={"class": "form-control"}),
@@ -109,7 +114,6 @@ class RegisterTeamHopeForm(forms.ModelForm):
         widget=forms.FileInput(
             attrs={
                 "class": "form-control",
-                "onchange": "previewImage(this)",
                 "name": "profile_picture",
                 "id": "profile_picture",
             }
