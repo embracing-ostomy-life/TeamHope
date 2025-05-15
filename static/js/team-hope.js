@@ -48,9 +48,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // create a help text for the input element
         const helpText = Object.assign(document.createElement("small"), {
             id: "phone-help-text",
-            className: "form-text",
-            value: "Invalid Phone number",
-            style: "color:red; display:block;"
+            className: "form-text m-3",
+            innerText: "Invalid Phone Number.",
+            style: "color:red;display:none;"
         });
 
         divElement.appendChild(inputElement);
@@ -74,11 +74,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const phoneRegex = /^\+?\d{9,15}$/;
         const phoneHelpText = document.querySelector("#phone-help-text");
         if (phoneInput) {
-            if (phoneRegex.test(phoneInput.value.trim())) {
-                console.log("We have a valid phone number!!");
-                phoneHelpText.classList.remove("text-muted");
-            } else {
-                console.log("We have an invalid phone number!");
+            if (!phoneRegex.test(phoneInput.value.trim())) {
+                phoneHelpText.style.display = "block";
+                phoneInput.focus();
                 return false
             }
         }
