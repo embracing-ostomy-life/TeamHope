@@ -106,6 +106,33 @@ class TeamHopeMemberRoleChoices(models.TextChoices):
     VOLUNTEER = "Volunteer", _("Veteran Ostomate Volunteer")
 
 
+class CommunicationChoices(models.TextChoices):
+    """
+    These choices are used when a user wants to be a participant,
+    they can choose one or all of these choices with email set as default
+    """
+    PHONE = "phone", _("Phone")
+    EMAIL = "email", _("Email")
+    CHAT = "chat", _("Private Online Chat")
+
+    @property
+    def default(self):
+        return CommunicationChoices.EMAIL
+
+
+class UserMethodOfCommunication(models.Model):
+    """A bridge model that stores all the methods of communication for a user"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    communication_method = models.CharField(choices=CommunicationChoices.choices)
+
+    class Meta:
+        unique_together = [["user", "communication_method"]]
+
+    def __str__(self):
+        """String representation of a UserMethodOfCommunication Model"""
+        return f"User: {self.user}, communication method: {self.communication_method}"
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.CharField(
@@ -139,7 +166,7 @@ class UserProfile(models.Model):
         null=True,
         blank=True,
     )
-
+    phone = models.CharField(max_length=15, null=True, blank=True)
     secondary_language = models.CharField(
         max_length=100,
         choices=SecondaryLanguageChoices.choices,
@@ -176,7 +203,7 @@ class UserProfile(models.Model):
         )
 
         super().save(*args, **kwargs)
-
+    
     @property
     def days_until_surgery(self):
         if self.surgery_date:
