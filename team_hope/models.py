@@ -121,7 +121,11 @@ class CommunicationChoices(models.TextChoices):
 
 
 class UserMethodOfCommunication(models.Model):
-    """A bridge model that stores all the methods of communication for a user"""
+    """
+    A bridge model that stores all the methods of communication for a user
+    With the assumption that email is the default method of communication
+    whether there's an entry with it or not
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     communication_method = models.CharField(choices=CommunicationChoices.choices)
 
@@ -130,7 +134,7 @@ class UserMethodOfCommunication(models.Model):
 
     def __str__(self):
         """String representation of a UserMethodOfCommunication Model"""
-        return f"User: {self.user}, communication method: {self.communication_method}"
+        return f"User: {self.user.email} : {self.communication_method}"
 
 
 class UserProfile(models.Model):
@@ -203,7 +207,7 @@ class UserProfile(models.Model):
         )
 
         super().save(*args, **kwargs)
-    
+
     @property
     def days_until_surgery(self):
         if self.surgery_date:
