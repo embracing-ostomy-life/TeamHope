@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import UserProfile, UserIdentityInfo
+from .models import UserProfile, UserIdentityInfo, UserMethodOfCommunication
 
 admin.site.register(UserIdentityInfo)
 
@@ -82,3 +82,10 @@ class UserProfileAdmin(admin.ModelAdmin):
 
     get_email.admin_order_field = "user__email"
     get_email.short_description = "Email"
+
+
+class UserMethodOfCommunicationAdmin(admin.ModelAdmin):
+    list_filter = ("user", "communication_method")
+
+
+admin.site.register(UserMethodOfCommunication, UserMethodOfCommunicationAdmin)
