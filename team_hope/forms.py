@@ -70,6 +70,7 @@ class RegisterTeamHopeForm(forms.ModelForm):
     communication_method = forms.MultipleChoiceField(
         choices=CommunicationChoices.choices,
         widget=forms.CheckboxSelectMultiple,
+        initial=[CommunicationChoices.EMAIL],
         required=False,
     )
 
