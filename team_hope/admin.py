@@ -28,6 +28,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         "primary_language",
         "hobbies",
         "bio",
+        "notes",
 
     )
     list_filter = (
@@ -86,6 +87,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 class UserMethodOfCommunicationAdmin(admin.ModelAdmin):
     list_filter = ("user", "communication_method")
+    search_fields = ("user__username", "user__first_name", "user__last_name", "user__email")
 
 
 admin.site.register(UserMethodOfCommunication, UserMethodOfCommunicationAdmin)
