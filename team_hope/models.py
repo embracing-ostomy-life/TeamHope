@@ -181,6 +181,7 @@ class UserProfile(models.Model):
 
     hobbies = models.TextField(null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
     subscribed_to_email_updates = models.BooleanField(default=False)
     subscribed_to_aliveandkicking = models.BooleanField(default=False)
     team_hope_docusign_complete = models.BooleanField(verbose_name="Team Hope Docusign", default=False)
