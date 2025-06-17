@@ -1,0 +1,129 @@
+body, html {
+    background-color: #bfe89f;
+}
+
+form {
+    background-color: #ffffff;
+    margin: 40px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: content-box;
+    border-radius: 5px;
+}
+
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: normal;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    flex: 1;
+    column-gap: 30px;
+    row-gap: 20px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 10px auto;
+    cursor: pointer;
+}
+
+.card:nth-of-type(1) {
+    margin-right: 10px;
+}
+
+.card:nth-of-type(2) {
+    margin-left: 10px;
+}
+
+.container {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.img {
+    width: 200px;
+    height: 80px;
+}
+
+.card-logo {
+    height: 50%;
+}
+
+#submit-btn {
+    background-color: #ff8568;
+    margin-bottom: 20px;
+}
+
+.logout-btn {
+    border: 1px solid #ff8568;
+    color: #000000;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.logout-btn:hover {
+    background-color: #ff8568;
+    text-decoration: none;
+    color: #000000;
+
+}
+
+@media only screen and (max-width: 900px) {
+    form {
+        margin: 20px;
+    }
+
+    .header {
+        justify-content: space-between;
+    }
+
+    .header-text > h1 {
+        font-size: 30px;
+    }
+
+    .header-text > p {
+        text-align: center;
+        text-wrap: pretty;
+        font-size: 15px;
+    }
+
+    .header-image {
+        width: 50px;
+        height: 50px;
+    }
+
+    .cards {
+        flex-direction: column;
+    }
+
+    .card:nth-of-type(1) {
+        margin-right: 0;
+    }
+
+    .card:nth-of-type(2) {
+        margin-left: 0;
+    }
+
+}

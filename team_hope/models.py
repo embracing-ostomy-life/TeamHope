@@ -197,6 +197,7 @@ class UserProfile(models.Model):
         blank=True,
     )
     aliveandkicking_waiver_complete = models.BooleanField(verbose_name="Alive And Kicking Waiver", default=False)
+    signup_complete = models.BooleanField(default=False)
     registration_complete = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):

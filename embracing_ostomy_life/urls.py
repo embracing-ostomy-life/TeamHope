@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+# handler400 = "team_hope.views.handler400"
+# handler500 = "team_hope.views.handler500"
+
 urlpatterns = [
     path('', include('team_hope.urls')),
     path('admin/', admin.site.urls),

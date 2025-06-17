@@ -70,4 +70,5 @@ urlpatterns = [
     ),  # Add this line
     path("docusign/webhook", views.docusign_webhook, name="docusign_webhook"),
     path("cometchat/webhook", views.cometchat_webhook, name="cometchat_webhook"),
+    path("registration/complete-signup", views.complete_signup, name="complete-signup"),
 ]
