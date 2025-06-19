@@ -417,6 +417,10 @@ def register_team_hope(request):
             profile.registration_complete = False
             profile.signup_complete = True
             profile.save()
+            msg = ("Looking for more support? "
+                   "You can also join our second program at any "
+                   "time from your account homepage.")
+            messages.add_message(request, messages.INFO, msg)
             return redirect("team_hope:home")
         else:
             logging.error(f"Error filling up the form: {form.errors}", )
@@ -480,6 +484,10 @@ def register_alive_and_kicking(request):
             )
             profile.signup_complete = True
             profile.save()
+            msg = ("Looking for more support? "
+                   "You can also join our second program at any "
+                   "time from your account homepage.")
+            messages.add_message(request, messages.INFO, msg)
             return redirect("team_hope:home")
     else:
         form = RegisterAliveAndKickingForm(instance=profile)

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% block title %}Home{% endblock %}
+{% block head %}
+    {{ block.super }}
+{% endblock %}
+{% block content %}
+    <div id="get-target">
+        <div class="d-flex align-items-center justify-content-center">
+            <h3 class="text-center fw-bold">Welcome, {{ user.get_full_name }}</h3>
+        </div>
+        <style>
+            .cards {
+                display: flex;
+                justify-content: space-around;
+                column-gap: 30px;
+                row-gap: 30px;
+                margin-top: 30px;
+            }
+
+            .card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex-grow: 1;
+                flex-basis: 1px;
+                background-color: #ffffff;
+                border-radius: 32px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                box-sizing: border-box;
+                position: relative;
+            }
+
+            .card .logo-section {
+                width: 100%;
+                background-color: #bfe89f;
+                padding: 100px 0;
+                background-position: bottom 0 left 0, center center;
+                background-size: 100%, auto;
+                background-repeat: no-repeat, no-repeat;
+                border-top-right-radius: 32px;
+                border-top-left-radius: 32px;
+            }
+
+            .card .logo-section.top-section-left {
+                background-image: url(//embracingostomylife.org/wp-content/uploads/graphics/box-curved-bottom.svg), url(//embracingostomylife.org/wp-content/uploads/graphics/aklogo.png);
+                background-size: 100%, 70%;
+                clip-path: inset(0 0 0.5px 0);
+            }
+
+            .card .logo-section.top-section-middle {
+                background-image: url(//embracingostomylife.org/wp-content/uploads/graphics/box-curved-bottom.svg), url(//embracingostomylife.org/wp-content/uploads/graphics/teamhope-logo.png);
+                background-size: 100%, 60%;
+                clip-path: inset(0 0 0.5px 0);
+            }
+
+            .card .logo-section.top-section-right {
+                background-image: url(//embracingostomylife.org/wp-content/uploads/graphics/box-curved-bottom.svg), url('/static/team_hope_chat.png');
+                background-size: 100%, 60%;
+                clip-path: inset(0 0 0.5px 0);
+            }
+
+            .gb-container .text {
+                flex: 1;
+                padding: 20px 20px 0 20px;
+                background: white;
+            }
+
+            .gb-container .text p {
+                color: #282828;
+            }
+
+            .card .btn-wrap {
+                margin-bottom: 30px;
+                padding: 0px 15px;
+            }
+
+            .buttons.coral {
+                padding: 12px 32px;
+                border-radius: 12px;
+                font-family: 'CircularStd-Bold', Arial, sans-serif;
+                font-size: 16px;
+                border-bottom: 3px solid #282828;
+                color: #282828;
+                display: inline-flex;
+                text-decoration: none;
+                background-color: #f96744;
+                font-weight: 900;
+                text-align: center;
+                /* Centers the text */
+                box-sizing: border-box;
+                margin: auto;
+            }
+
+            .buttons.coral:hover {
+                background-color: #ff8568;
+            }
+
+            @media screen and (max-width: 768px) {
+                .cards {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .card {
+                    width: 100%;
+                    /* Adjust width for better mobile view */
+                    margin-bottom: 20px;
+                    /* Add some spacing between stacked cards */
+                }
+            }
+        </style>
+        <div class="gb-container cards">
+            <div class="gb-container card">
+                <div class="gb-container logo-section top-section-left"></div>
+                <div class="gb-container text">
+                    <p class="gb-headline gb-headline-text">An immediate post-surgery program designed
+                        to meet you where you are on your ostomy journey with tips from medical professionals and other
+                        ostomates to help you recover quicker… and better!</p>
+                    {% if a_k_docusign_waiting %}
+                        <p><i><b>Thank you for signing up for the Alive & Kicking Ostomy Recovery Program.
+                            Please complete your Docusign Participation agreement to begin receiving our 28 daily emails
+                            filled
+                            with
+                            education, encouragement and HOPE beginning on your surgery date.</i></b></p>
+                    {% endif %}
+                </div>
+                <div class="gb-container btn-wrap">
+                    {% if alive_and_kicking_subscribed %}
+                        <a href="/unsubscribe/alive_and_kicking" class="gb-button gb-button-text buttons coral">Unsubscribe
+                            from Alive & Kicking</a>
+                    {% elif a_k_docusign_waiting == False %}
+                        <a href="{% url 'team_hope:register_alive_and_kicking' %}"
+                           class="gb-button gb-button-text buttons coral">Register
+                            for Alive
+                            & Kicking</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="gb-container card">
+                <div class="gb-container logo-section top-section-middle"></div>
+                <div class="gb-container text">
+                    <p class="gb-headline gb-headline-text">Connects new ostomates with volunteer
+                        “veteran” ostomates who will listen, empathize, and suggest resources based on their
+                        experience.</p>
+                    {% if t_h_docusign_waiting %}
+                        <p><i><b>Thank you for signing up for the Team HOPE Program. Please complete your Docusign
+                            Volunteer/Participation agreement. If you are a veteran Volunteer, <a
+                                    href="https://embracingostomylife.org/courses/the-ostomy-friends-program/"
+                                    target="_blank">please also complete the
+                                UOAA Ostomy friends course.</a>
+                        </b></i></p>
+                    {% endif %}
+                </div>
+                <div class="gb-container btn-wrap">
+                    {% if teamhope_subscribed %}
+                        <a href="/unsubscribe/teamhope" class="gb-button gb-button-text buttons coral">Unsubscribe
+                            from Team HOPE</a>
+                    {% elif t_h_docusign_waiting == False %}
+                        <a class="gb-button gb-button-text buttons coral"
+                           href="{% url 'team_hope:register_team_hope' %}">Register for Team
+                            HOPE</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="gb-container card">
+                <div class="gb-container logo-section top-section-right"></div>
+
+                <div class="gb-container text">
+                    <p class="gb-headline gb-headline-text">Our on-line platform that allows Team HOPE members to
+                        communicate in a secure environment.</p>
+                </div>
+                {% if chat_enabled %}
+                    <div class="gb-container btn-wrap">
+                        <a href="/chat" class="gb-button gb-button-text buttons coral">Chat now</a>
+                    </div>
+                {% else %}
+                    <div class="gb-container btn-wrap">
+                        <a class="gb-button gb-button-text buttons coral"
+                           href="{% url 'team_hope:register_team_hope' %}">Register
+                            for Team
+                            HOPE</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

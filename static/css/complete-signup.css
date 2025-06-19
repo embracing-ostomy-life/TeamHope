@@ -26,6 +26,20 @@ form {
     align-items: center;
 }
 
+.header-text > p:nth-of-type(1) {
+    margin-bottom: 1px;
+}
+
+.header-text > p:nth-of-type(2) {
+    margin-top: 1px;
+}
+
+
+.logo-text {
+    justify-self: flex-end;
+    padding: 12px;
+}
+
 .cards {
     display: flex;
     flex-direction: row;
@@ -39,11 +53,8 @@ form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: stretch;
     flex: 1;
-    column-gap: 30px;
-    row-gap: 20px;
-    padding: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin: 10px auto;
     cursor: pointer;
@@ -51,10 +62,17 @@ form {
 
 .card:nth-of-type(1) {
     margin-right: 10px;
+    column-gap: 30px;
+    row-gap: 20px;
+    padding: 10px;
 }
 
 .card:nth-of-type(2) {
     margin-left: 10px;
+    column-gap: 20px;
+    row-gap: 20px;
+    padding: 10px;
+    align-self: stretch;
 }
 
 .container {
@@ -99,13 +117,19 @@ form {
         justify-content: space-between;
     }
 
+    .header-text {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
     .header-text > h1 {
         font-size: 30px;
     }
 
     .header-text > p {
         text-align: center;
-        text-wrap: pretty;
+        text-wrap: balance;
         font-size: 15px;
     }
 
@@ -126,4 +150,14 @@ form {
         margin-left: 0;
     }
 
+}
+
+@media only screen and (max-width: 400px) {
+    .header-text > h1 {
+        font-size: 20px;
+    }
+
+    p {
+        font-size: 12px;
+    }
 }

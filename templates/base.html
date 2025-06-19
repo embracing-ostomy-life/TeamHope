@@ -24,7 +24,16 @@
 
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 {% include 'team_hope/bootstrap_nav.html' %}
-
+<div class="messages">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} centered alert-dismissible fade show" role="alert">
+                <strong class="centered">{{ message }}</strong>
+                <button class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
 <div class="container mt-4">
     <div class="card shadow-lg p-4">
         {% block content %}{% endblock %}
