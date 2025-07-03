@@ -89,6 +89,10 @@ form {
     height: 50%;
 }
 
+.logo-img {
+    padding-top: 10px;
+}
+
 #submit-btn {
     background-color: #ff8568;
     margin-bottom: 20px;

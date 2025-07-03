@@ -111,7 +111,18 @@
                 }
             }
         </style>
+        <div class="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} centered alert-dismissible fade show" role="alert">
+                        <strong class="centered h2">{{ message }}</strong>
+                        <button class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
         <div class="gb-container cards">
+            
             <div class="gb-container card">
                 <div class="gb-container logo-section top-section-left"></div>
                 <div class="gb-container text">

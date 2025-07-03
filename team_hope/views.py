@@ -416,11 +416,12 @@ def register_team_hope(request):
             profile.docusign_teamhope_envelope_id = response.get("envelope_id", "")
             profile.registration_complete = False
             profile.signup_complete = True
+            profile.registered_th = True
             profile.save()
-            msg = ("Looking for more support? "
-                   "You can also join our second program at any "
-                   "time from your account homepage.")
-            messages.add_message(request, messages.INFO, msg)
+            if not profile.registered_ak:
+                msg = ("Looking for more support? "
+                       "You can also join the Alive and Kicking program at any time.")
+                messages.add_message(request, messages.INFO, msg)
             return redirect("team_hope:home")
         else:
             logging.error(f"Error filling up the form: {form.errors}", )
@@ -483,11 +484,13 @@ def register_alive_and_kicking(request):
                 "envelope_id", ""
             )
             profile.signup_complete = True
+            profile.registered_ak = True
             profile.save()
-            msg = ("Looking for more support? "
-                   "You can also join our second program at any "
-                   "time from your account homepage.")
-            messages.add_message(request, messages.INFO, msg)
+            if not profile.registered_th:
+                msg = ("Looking for more support? "
+                       "You can also join the Team Hope program"
+                       "at any time")
+                messages.add_message(request, messages.INFO, msg)
             return redirect("team_hope:home")
     else:
         form = RegisterAliveAndKickingForm(instance=profile)
