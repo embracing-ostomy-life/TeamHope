@@ -206,16 +206,16 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',  # os.environ.get('DBNAME'),
-#         'HOST': 'localhost',  # os.environ.get('DBHOST'),
-#         'PORT': '5431',  # os.environ.get('DBPORT'),jhh
-#         'USER': 'postgres',  # os.environ.get('DBUSER'),
-#         'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # os.environ.get('DBNAME'),
+        'HOST': 'localhost',  # os.environ.get('DBHOST'),
+        'PORT': '5431',  # os.environ.get('DBPORT'),jhh
+        'USER': 'postgres',  # os.environ.get('DBUSER'),
+        'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
+    }
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"
