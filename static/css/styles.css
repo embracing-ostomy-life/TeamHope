@@ -86,7 +86,6 @@ label {
 }
 
 
-
 .custom-logout-button:hover {
     background-color: var(--brand-orange-salmon);
     border-color: var(--brand-orange-salmon);
@@ -136,8 +135,8 @@ label {
     margin-bottom: 10px;
 }
 
-form .row>.col-md-6,
-form .row>.col-md-12 {
+form .row > .col-md-6,
+form .row > .col-md-12 {
     margin-bottom: 10px;
 }
 
@@ -191,13 +190,13 @@ input[type="date"]:focus {
     cursor: pointer;
 }
 
-.custom-checkbox+.form-check-label {
+.custom-checkbox + .form-check-label {
     position: relative;
     padding-left: 30px;
     cursor: pointer;
 }
 
-.custom-checkbox+.form-check-label:before {
+.custom-checkbox + .form-check-label:before {
     content: "";
     position: absolute;
     left: 0;
@@ -209,12 +208,12 @@ input[type="date"]:focus {
     background-color: #fff;
 }
 
-.custom-checkbox:checked+.form-check-label:before {
+.custom-checkbox:checked + .form-check-label:before {
     background-color: var(--brand-teal-ocean);
     border-color: var(--brand-teal-ocean);
 }
 
-.custom-checkbox:checked+.form-check-label:after {
+.custom-checkbox:checked + .form-check-label:after {
     content: "";
     position: absolute;
     left: 7px;
@@ -255,15 +254,20 @@ input[type="date"]:focus {
 }
 
 @media screen and (max-width: 768px) {
-    .navbar.custom-navbar>.container {
+    .navbar.custom-navbar > .container {
         flex-direction: row;
         flex-wrap: nowrap;
     }
 
-    .navbar.custom-navbar>.container .navbar-collapse {
+    .navbar.custom-navbar > .container .navbar-collapse {
         position: absolute;
         left: auto;
         right: 10px;
         top: 60px;
     }
+}
+
+.messages {
+    text-align: center;
+    color: red;
 }

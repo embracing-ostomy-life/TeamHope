@@ -190,6 +190,8 @@ class UserProfile(models.Model):
     docusign_aliveandkicking_envelope_id = models.TextField(default="", editable=False)
     docusign_teamhope_envelope_id = models.TextField(default="", editable=False)
     subscribed_to_teamhope = models.BooleanField(default=False)
+    registered_th = models.BooleanField(default=False)  # Registered for team hope but waiting for docusign
+    registered_ak = models.BooleanField(default=False)  # registered for alive and kicking waiting for docusign
     teamhope_member_role = models.CharField(
         max_length=100,
         choices=TeamHopeMemberRoleChoices.choices,
@@ -197,6 +199,7 @@ class UserProfile(models.Model):
         blank=True,
     )
     aliveandkicking_waiver_complete = models.BooleanField(verbose_name="Alive And Kicking Waiver", default=False)
+    signup_complete = models.BooleanField(default=False)
     registration_complete = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):

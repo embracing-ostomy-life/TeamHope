@@ -23,10 +23,12 @@ from django.http import (
     JsonResponse,
     HttpResponseRedirect,
     HttpResponseBadRequest,
+    HttpResponseServerError,
 )
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
 from jwt import PyJWKClient
@@ -100,12 +102,13 @@ def azure_b2c_callback(request):
         user.last_name = last_name
         user.save()
 
-        identity_info, created = UserIdentityInfo.objects.get_or_create(user=user)
+        identity_info, _ = UserIdentityInfo.objects.get_or_create(user=user)
         identity_info.uuid = guid
         identity_info.save()
         logging.debug(f"Identity Info saved with uuid {guid}")
 
         profile, created = UserProfile.objects.get_or_create(user=user)
+
         profile.country = payload.get("country", "")
         profile.save()
 
@@ -114,7 +117,10 @@ def azure_b2c_callback(request):
             ccuser.sync()
 
         login(request, user)
+        if not profile.signup_complete:
+            return redirect("team_hope:complete-signup")
         return redirect(f"{next_page}")
+
 
     except jwt.ExpiredSignatureError:
         logging.error("Token has expired")
@@ -122,9 +128,12 @@ def azure_b2c_callback(request):
     except jwt.InvalidTokenError:
         logging.error("Token is invalid")
         return HttpResponse("Invalid token", status=400)
+    except UserProfile.DoesNotExist as e:
+        logging.error("UserProfile does not exist")
+        return HttpResponseServerError(f"{e}")
     except Exception as e:
         logging.error(f"An unexpected error : {e} occurred ")
-        return HttpResponse("An error occurred.", status=500)
+        return HttpResponseServerError(f"{e}")
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -268,7 +277,8 @@ def home(request):
     is_profile_complete = (
         profile.registration_complete
     )  # user_profile_is_complete(current_user)
-
+    if not profile.signup_complete:
+        return redirect("team_hope:complete-signup")
     if request.method == "POST":
         form = RegisterForm(request.POST, instance=current_user.userprofile)
         if form.is_valid():
@@ -405,7 +415,13 @@ def register_team_hope(request):
             )
             profile.docusign_teamhope_envelope_id = response.get("envelope_id", "")
             profile.registration_complete = False
+            profile.signup_complete = True
+            profile.registered_th = True
             profile.save()
+            if not profile.registered_ak:
+                msg = ("Looking for more support? "
+                       "You can also join the Alive and Kicking program at any time.")
+                messages.add_message(request, messages.INFO, msg)
             return redirect("team_hope:home")
         else:
             logging.error(f"Error filling up the form: {form.errors}", )
@@ -467,7 +483,14 @@ def register_alive_and_kicking(request):
             profile.docusign_aliveandkicking_envelope_id = response.get(
                 "envelope_id", ""
             )
+            profile.signup_complete = True
+            profile.registered_ak = True
             profile.save()
+            if not profile.registered_th:
+                msg = ("Looking for more support? "
+                       "You can also join the Team Hope program"
+                       "at any time")
+                messages.add_message(request, messages.INFO, msg)
             return redirect("team_hope:home")
     else:
         form = RegisterAliveAndKickingForm(instance=profile)
@@ -667,3 +690,28 @@ def cometchat_webhook(request):  # TODO in the future, we want to use all the fi
         return JsonResponse({"status": "success"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+# def handler500(request, *args, **kwargs):
+#     """View for handling server errors that occur"""
+#     return render(request, "500.html", status=500)
+#
+#
+# def handler400(request, *args, **kwargs):
+#     """View for handling bad requests"""
+#     return render(request, "400.html", status=400)
+
+
+def complete_signup(request, *ags, **kwargs):
+    if request.method == "POST":
+        register_choice = request.POST.get("register-choice")
+        if register_choice:
+            if register_choice == "alive_and_kicking":
+                return redirect("team_hope:register_alive_and_kicking")
+            elif register_choice == "team_hope":
+                return redirect("team_hope:register_team_hope")
+        else:
+            msg = _("Pick one of the programs to proceed.")
+            messages.add_message(request, messages.WARNING, msg)
+    # messages.add_message(request, messages.SUCCESS, "Welcome to this page")
+    return render(request, "team_hope/complete-signup.html")
