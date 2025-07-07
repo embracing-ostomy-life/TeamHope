@@ -17,26 +17,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const roleSelect = document.getElementById("id_teamhope_member_role");
     const takeTheCourseDiv = document.getElementById("take_the_course");
     const communicationDiv = document.querySelector("#communication-div");
-    const togglePhoneInput = document.querySelector("#id_communication_method_0");
+    const togglePhoneInput = document.querySelector("#id_communication_method_0") ?? null;
     const uoaaTakenCheckbox = document.getElementById("id_uoaa_taken");
     const registerForm = document.querySelector("#team-hope-register-form");
+    if (togglePhoneInput !== null) {
+        togglePhoneInput.addEventListener("change", (evt) => {
+            // Check if the phone number input is displayed
+            let phoneInputDiv = document.querySelector("#phone-input-div") ?? null;
+            const phoneInputParent = document.querySelector("#id_communication_method");
+            if (phoneInputDiv === null) {
+                // The phone element does not exist, create it
+                phoneInputDiv = createInputElement();
+                const phoneCheckBox = phoneInputParent.children[1];
+                phoneInputParent.insertBefore(phoneInputDiv, phoneCheckBox);
 
-    togglePhoneInput.addEventListener("change", (evt) => {
-        // Check if the phone number input is displayed
-        let phoneInputDiv = document.querySelector("#phone-input-div") ?? null;
-        const phoneInputParent = document.querySelector("#id_communication_method");
-        if (phoneInputDiv === null) {
-            // The phone element does not exist, create it
-            phoneInputDiv = createInputElement();
-            const phoneCheckBox = phoneInputParent.children[1];
-            phoneInputParent.insertBefore(phoneInputDiv, phoneCheckBox);
+            } else {
+                // Remove the child element
+                phoneInputParent.removeChild(phoneInputDiv);
+            }
 
-        } else {
-            // Remove the child element
-            phoneInputParent.removeChild(phoneInputDiv);
-        }
+        });
+    }
 
-    });
 
     function createInputElement() {
         const divElement = document.createElement("div");

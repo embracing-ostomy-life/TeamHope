@@ -14,7 +14,6 @@
         <!-- Custom CSS for Colors and Styles -->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet">
         <!-- Custom JS -->
-        <script src="{% static 'js/team-hope.js' %}" type="text/javascript"></script>
         <!-- HTMX -->
         <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.js"
                 integrity="sha384-qbtR4rS9RrUMECUWDWM2+YGgN3U4V4ZncZ0BvUcg9FGct0jqXz3PUdVpU1p0yrXS"
@@ -32,6 +31,8 @@
 
 <!-- Bootstrap JS (optional, but recommended for some components like modals) -->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+{% block script_block %}
+{% endblock script_block %}
 </body>
 
 </html>

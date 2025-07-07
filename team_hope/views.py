@@ -371,7 +371,7 @@ def register_team_hope(request):
 
                 try:
                     if len(communication_method) == 1:
-                        _ = UserMethodOfCommunication.objects.create(
+                        _, _ = UserMethodOfCommunication.objects.update_or_create(
                             user=current_user,
                             communication_method=communication_method[0]
                         )
@@ -383,7 +383,12 @@ def register_team_hope(request):
                             )
                             for method in communication_method
                         ]
-                        UserMethodOfCommunication.objects.bulk_create(bulk)
+                        UserMethodOfCommunication.objects.bulk_create(
+                            bulk,
+                            update_conflicts=True,
+                            unique_fields=["user", "communication_method"],
+                            update_fields=["communication_method"]
+                        )
                     if form.data.get("phone-number"):
                         profile.phone = form.data.get("phone-number")
                 except IntegrityError as error:
