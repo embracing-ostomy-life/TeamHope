@@ -39,7 +39,6 @@ def send_aliveandkicking_welcome(sender, instance, **kwargs):
             not instance.subscribed_to_aliveandkicking
             and instance.aliveandkicking_waiver_complete
     ):
-        logger.info(f"{instance.user.email}: Has been added to Alive and Kicking Journey")
         add_to_aliveandkicking_journey(user=instance.user, userprofile=instance)
         logger.info(f"{instance.user.email}: Has been added to Alive and Kicking Journey")
         profile = instance
@@ -48,8 +47,6 @@ def send_aliveandkicking_welcome(sender, instance, **kwargs):
         # send_aliveandkicking_welcome_email(instance.user)
         # send_aliveandkicking_welcome_email_html(instance.user)
     if not instance.subscribed_to_teamhope and instance.team_hope_docusign_complete:
-        logger.info(f"{instance.user.email}: Subscribed to TeamHope: {instance.subscribed_to_teamhope}")
-        logger.info(f"{instance.user.email}: TeamHope Docusign Complete: {instance.team_hope_docusign_complete}")
         add_to_teamhope_journey(user=instance.user, userprofile=instance)
         logger.info(f"{instance.user.email}: Has been added to Team Hope Journey.")
         profile = instance

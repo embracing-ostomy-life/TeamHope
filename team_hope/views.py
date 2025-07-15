@@ -36,9 +36,6 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 from components.cascading_selects.states import state_countries_dict
-from team_hope.utils.email_utils import (
-    send_cometchat_admins_new_person_alert_email
-)
 from .cometchat import CCUser
 from .forms import (
     RegisterAliveAndKickingForm,
@@ -130,7 +127,9 @@ def azure_b2c_callback(request):
         return HttpResponse("Invalid token", status=400)
     except UserProfile.DoesNotExist as e:
         logging.error("UserProfile does not exist")
-        return HttpResponseServerError(f"{e}")
+        profile = UserProfile.objects.create(user=user)
+        logging.debug(f"The user exists now: {profile}")
+        return redirect("team_hope:azure_b2c_logout")
     except Exception as e:
         logging.error(f"An unexpected error : {e} occurred ")
         return HttpResponseServerError(f"{e}")
@@ -229,20 +228,21 @@ def docusign_webhook(request):
                     profile.team_hope_docusign_complete = True
 
                     # Only after signing the team hope docusing should the user be added to cometchat
-                    try:
-                        ccuser = CCUser(profile.user)
-                        resp = ccuser.sync()
-                        logging.debug(f"CCUser Response: ({resp})")
-                        if "createdAt" in resp or "updatedAt" in resp:
-                            # The profile is being created or updated
-                            # either way, the profile can be marked as complete
-                            profile.registration_complete = True
-                        if "createdAt" in resp and "updatedAt" not in resp:
-                            # Send email to chat admins
-                            send_cometchat_admins_new_person_alert_email(profile)
-
-                    except Exception as error:
-                        logging.error(f"Failed to sync CometChat user: {error}")
+                    # The portion of code bellow is commented out because we are not using cometchat
+                    # try:
+                    #     ccuser = CCUser(profile.user)
+                    #     resp = ccuser.sync()
+                    #     logging.debug(f"CCUser Response: ({resp})")
+                    #     if "createdAt" in resp or "updatedAt" in resp:
+                    #         # The profile is being created or updated
+                    #         # either way, the profile can be marked as complete
+                    #         profile.registration_complete = True
+                    #     if "createdAt" in resp and "updatedAt" not in resp:
+                    #         # Send email to chat admins
+                    #         send_cometchat_admins_new_person_alert_email(profile)
+                    #
+                    # except Exception as error:
+                    #     logging.error(f"Failed to sync CometChat user: {error}")
 
                 profile.save()
             else:
@@ -280,9 +280,9 @@ def home(request):
     if not profile.signup_complete:
         return redirect("team_hope:complete-signup")
     if request.method == "POST":
-        form = RegisterForm(request.POST, instance=current_user.userprofile)
+        form = RegisterForm(request.POST, instance=profile)
         if form.is_valid():
-            profile = form.save(commit=False)
+            form.save(commit=False)
             profile.registration_complete = True
             profile.save()
             try:
@@ -292,7 +292,7 @@ def home(request):
             except Exception as error:
                 logging.error(f"Failed to sync CometChat user: {error}")
     else:
-        form = RegisterForm(instance=current_user.userprofile)
+        form = RegisterForm(instance=profile)
 
     params = {
         "chat_enabled": is_profile_complete,
@@ -364,6 +364,7 @@ def register_team_hope(request):
 
     if request.method == "POST":
         form = RegisterTeamHopeForm(request.POST, request.FILES, instance=profile)
+        profile, created = UserProfile.objects.get_or_create(user=current_user)
         if form.is_valid():
             image_file = form.cleaned_data.get("profile_picture")
             communication_method = form.cleaned_data.pop("communication_method")
@@ -396,8 +397,7 @@ def register_team_hope(request):
                     logger.debug(f"Communication method: {communication_method} already exists")
                 except Exception:
                     logger.debug("Exception occurred: During Communication method creation")
-            profile = form.save(commit=False)
-
+            form.save()
             if image_file:
                 try:
                     profile.profile_picture = process_profile_picture(image_file)
@@ -406,7 +406,7 @@ def register_team_hope(request):
                     profile.profile_picture = None
             profile.team_hope_docusign_complete = False
             profile.team_hope_training_complete = True
-            profile.team_hope_all_complete = True
+            profile.team_hope_all_complete = False
             docusign = DocuSignEmailSender()
             if profile.teamhope_member_role == TeamHopeMemberRoleChoices.PARTICIPANT:
                 template_id = settings.DS_TEAM_HOPE_MEMBER_TEMPLATE_ID
@@ -423,10 +423,11 @@ def register_team_hope(request):
             profile.signup_complete = True
             profile.registered_th = True
             profile.save()
+            profile.refresh_from_db()
             if not profile.registered_ak:
                 msg = ("Looking for more support? "
                        "You can also join the Alive and Kicking program at any time.")
-                messages.add_message(request, messages.INFO, msg)
+                messages.info(request, msg)
             return redirect("team_hope:home")
         else:
             logging.error(f"Error filling up the form: {form.errors}", )
@@ -479,7 +480,7 @@ def register_alive_and_kicking(request):
     if request.method == "POST":
         form = RegisterAliveAndKickingForm(request.POST, instance=profile)
         if form.is_valid():
-            profile = form.save(commit=False)
+            form.save()
             docusign = DocuSignEmailSender()
             response = docusign.send_email(
                 customer_email=current_user.email,
@@ -491,11 +492,12 @@ def register_alive_and_kicking(request):
             profile.signup_complete = True
             profile.registered_ak = True
             profile.save()
-            if not profile.registered_th:
+            profile.refresh_from_db()
+            if not profile.registered_th and profile.signup_complete:
                 msg = ("Looking for more support? "
                        "You can also join the Team Hope program"
                        "at any time")
-                messages.add_message(request, messages.INFO, msg)
+                messages.info(request, msg)
             return redirect("team_hope:home")
     else:
         form = RegisterAliveAndKickingForm(instance=profile)
