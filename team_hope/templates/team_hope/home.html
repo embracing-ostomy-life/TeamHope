@@ -181,19 +181,24 @@
                 <div class="gb-container text">
                     <p class="gb-headline gb-headline-text">Our on-line platform that allows Team HOPE members to
                         communicate in a secure environment.</p>
+
+                    {% if chat_enabled %}
+                        <div class="gb-container btn-wrap">
+                            <a href="#" class="gb-button gb-button-text buttons coral">Coming Soon</a>
+                        </div>
+                    {% elif t_h_docusign_waiting %}
+                        <div class="gb-container btn-wrap">
+                            <p><i><b>Check your email and complete the docusign to access the chat</b><i></p>
+                        </div>
+                    {% else %}
+                        <div class="gb-container btn-wrap">
+                            <a class="gb-button gb-button-text buttons coral"
+                               href="{% url 'team_hope:register_team_hope' %}">Register
+                                for Team
+                                HOPE</a>
+                        </div>
+                    {% endif %}
                 </div>
-                {% if chat_enabled %}
-                    <div class="gb-container btn-wrap">
-                        <a href="#" class="gb-button gb-button-text buttons coral">Coming Soon</a>
-                    </div>
-                {% else %}
-                    <div class="gb-container btn-wrap">
-                        <a class="gb-button gb-button-text buttons coral"
-                           href="{% url 'team_hope:register_team_hope' %}">Register
-                            for Team
-                            HOPE</a>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>
