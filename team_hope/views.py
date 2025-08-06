@@ -496,7 +496,7 @@ def register_alive_and_kicking(request):
             if not profile.registered_th and profile.signup_complete:
                 msg = ("Looking for more support? "
                        "You can also join the Team Hope program"
-                       "at any time")
+                       " at any time")
                 messages.info(request, msg)
             return redirect("team_hope:home")
     else:
