@@ -12,7 +12,7 @@
         </div>
     </div>
     <h2>Register for Alive & Kicking</h2>
-    <form method="post">
+    <form method="post" action="{% url 'team_hope:register_alive_and_kicking' %}">
         {% csrf_token %}
         <div class="form-group row">
             <!-- Surgery Date -->
