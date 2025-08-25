@@ -20,7 +20,7 @@ env = environ.Env(
 )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEBUG = False
+DEBUG = True
 # Take environment variables from .env file
 environ.Env.read_env(BASE_DIR / '.env')
 
@@ -206,16 +206,16 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',  # os.environ.get('DBNAME'),
-#         'HOST': 'localhost',  # os.environ.get('DBHOST'),
-#         'PORT': '5431',  # os.environ.get('DBPORT'),jhh
-#         'USER': 'postgres',  # os.environ.get('DBUSER'),
-#         'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # os.environ.get('DBNAME'),
+        'HOST': 'localhost',  # os.environ.get('DBHOST'),
+        'PORT': '5431',  # os.environ.get('DBPORT'),jhh
+        'USER': 'postgres',  # os.environ.get('DBUSER'),
+        'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
+    }
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"

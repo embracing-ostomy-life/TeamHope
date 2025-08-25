@@ -2,56 +2,55 @@
 {% load form_tags %}
 {% block title %}Register for Alive & Kicking{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-3">
-        <div class="col-md-12 align-items-center">
-            <div class="d-flex flex-column align-items-center">
-                <img src="https://embracingostomylife.org/wp-content/uploads/2024/05/aklogo-horizontal.png"
-                    alt="Alive & Kicking" class="h-12 w-auto">
+    <div class="container mt-5">
+        <div class="row mb-3">
+            <div class="col-md-12 align-items-center">
+                <div class="d-flex flex-column align-items-center">
+                    <img src="https://embracingostomylife.org/wp-content/uploads/2024/05/aklogo-horizontal.png"
+                         alt="Alive & Kicking" class="h-12 w-auto">
+                </div>
             </div>
         </div>
-    </div>
-    <h2>Register for Alive & Kicking</h2>
-    <form method="post" action="{% url 'team_hope:register_alive_and_kicking' %}">
-        {% csrf_token %}
-        <div class="form-group row">
-            <!-- Surgery Date -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    {{ form.surgery_date.label_tag }}
-                    {{ form.surgery_date|add_class:"form-control" }}
-                    {% if form.surgery_date.errors %}
-                    <div class="text-danger">
-                        {{ form.surgery_date.errors }}
+        <h2>Register for Alive & Kicking</h2>
+        <form method="post" action="{% url 'team_hope:register_alive_and_kicking' %}">
+            {% csrf_token %}
+            <div class="form-group row">
+                <!-- Surgery Date -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.surgery_date.label_tag }}
+                        {{ form.surgery_date|add_class:"form-control" }}
+                        {% if form.surgery_date.errors %}
+                            <div class="text-danger">
+                                {{ form.surgery_date.errors }}
+                            </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                <div class="col-md-6">
-                    {{ form.surgery_type.label_tag }}
-                    {{ form.surgery_type|add_class:"form-control" }}
+                    <div class="col-md-6">
+                        {{ form.surgery_type.label_tag }}
+                        {{ form.surgery_type|add_class :"form-control" }}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Terms and Conditions -->
-        <div class="form-group mt-3">
-            {{ form.certify }}
-            {{ form.certify.label_tag }}
-            {% if form.certify.errors %}
-            <div class="text-danger">
-                {{ form.certify.errors }}
+            <!-- Terms and Conditions -->
+            <div class="form-group mt-3">
+                {{ form.certify }}
+                {{ form.certify.label_tag }}
+                {% if form.certify.errors %}
+                    <div class="text-danger">
+                        {{ form.certify.errors }}
+                    </div>
+                {% endif %}
             </div>
-            {% endif %}
-        </div>
 
-        <div class="form-group mt-3">
-            <button type="submit" class="btn btn-primary">Register</button>
-        </div>
-        <div class="form-group mt-3">
-            <p><b>Please check your email after signing and complete your Docusign Participation agreement to begin
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+            <div class="form-group mt-3">
+                <p><b>Please check your email after signing and complete your Docusign Participation agreement to begin
                     receiving
-                    our 28 daily emails filled with education, encouragement and HOPE beginning on your surgery
-                    date.</b></p>
+                    our 28 daily emails filled with education, encouragement and HOPE beginning on your surgery date.</b></p>
         </div>
     </form>
 </div>
