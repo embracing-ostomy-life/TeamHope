@@ -188,7 +188,7 @@ def docusign_webhook(request):
     """
     docusign_webhook_secret = settings.DS_CALLBACK_SECRET
     if request.method != "POST":
-        return HttpResponseBadRequest("Invalid request method")
+        return HttpResponseBadRequest("Invalid request method! POST ONLY")
 
     # Retrieve the HMAC signature from the headers
     signature = request.headers.get("X-DocuSign-Signature-1")
