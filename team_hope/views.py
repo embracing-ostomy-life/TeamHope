@@ -1,4 +1,5 @@
 import base64
+import csv
 import hashlib
 import hmac
 import json
@@ -32,6 +33,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
 from jwt import PyJWKClient
+from rest_framework import views, permissions
+from rest_framework_csv.renderers import CSVRenderer
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -48,6 +51,7 @@ from .helpers.docusign_email_sender import DocuSignEmailSender
 from .models import (
     UserProfile, UserIdentityInfo, UserType, UserMethodOfCommunication, TeamHopeMemberRoleChoices
 )
+from .serializers import UserProfileSerializer
 from .utils.picture_utils import process_profile_picture
 from .utils.send_bulk_emails import notify_users_of_chat
 
@@ -722,3 +726,24 @@ def complete_signup(request, *ags, **kwargs):
             messages.add_message(request, messages.WARNING, msg)
     # messages.add_message(request, messages.SUCCESS, "Welcome to this page")
     return render(request, "team_hope/complete-signup.html")
+
+
+class UserListView(views.APIView):
+    """Class for listing all users"""
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAdminUser]
+    renderer_classes = [CSVRenderer, ]
+
+    def get(self, request, *args, **kwargs):
+        """Retrieve all the users"""
+        profiles = UserProfile.objects.select_related("user").all()
+        serializer = UserProfileSerializer(profiles, many=True)
+        data = serializer.data
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="users.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(data[0].keys())
+        for row in data:
+            writer.writerow(row.values())
+        return response

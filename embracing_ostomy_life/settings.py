@@ -110,6 +110,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "storages",
     "team_hope",
+    "rest_framework",
     # 'allauth.socialaccount.providers.azure',#
 ]
 

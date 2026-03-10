@@ -138,7 +138,7 @@ class UserMethodOfCommunication(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="owner")
     user_type = models.CharField(
         max_length=50,
         choices=UserType.choices,

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 
 from . import views
-from .views import ProfileUpdateView, CustomLogoutView
+from .views import ProfileUpdateView, CustomLogoutView, UserListView
 from .views import azure_b2c_login, azure_b2c_callback, home
 from .views import chat
 from .views import (
@@ -71,4 +71,5 @@ urlpatterns = [
     path("docusign/webhook", views.docusign_webhook, name="docusign_webhook"),
     path("cometchat/webhook", views.cometchat_webhook, name="cometchat_webhook"),
     path("registration/complete-signup", views.complete_signup, name="complete-signup"),
+    path("users/list", UserListView.as_view(), name="user_list"),
 ]
