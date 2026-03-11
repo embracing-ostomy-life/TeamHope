@@ -46,7 +46,7 @@ AZURE_B2C_TENANT = os.getenv("AZURE_B2C_TENANT")
 AZURE_B2C_DOMAIN = os.getenv("AZURE_B2C_DOMAIN")
 AZURE_B2C_POLICY_NAME = os.getenv("AZURE_B2C_POLICY_NAME")
 AZURE_B2C_REDIRECT_URI = os.getenv("DEV_AZURE_B2C_REDIRECT_URI")
-AZURE_POST_LOGOUT_REDIRECT_URI = os.getenv("APP_URL","https://app.embracingostomylife.org") + "/logout/complete/"
+AZURE_POST_LOGOUT_REDIRECT_URI = os.getenv("APP_URL", "https://app.embracingostomylife.org") + "/logout/complete/"
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 SENDGRID_ALIVE_AND_KICKING_ID = os.getenv("SENDGRID_ALIVE_AND_KICKING_ID")
 
@@ -206,16 +206,16 @@ DATABASES = {
     }
 }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',  # os.environ.get('DBNAME'),
-        'HOST': 'localhost',  # os.environ.get('DBHOST'),
-        'PORT': '5431',  # os.environ.get('DBPORT'),jhh
-        'USER': 'postgres',  # os.environ.get('DBUSER'),
-        'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',  # os.environ.get('DBNAME'),
+#         'HOST': 'localhost',  # os.environ.get('DBHOST'),
+#         'PORT': '5431',  # os.environ.get('DBPORT'),jhh
+#         'USER': 'postgres',  # os.environ.get('DBUSER'),
+#         'PASSWORD': 'TeamHope1',  # os.environ.get('DBPASS'),
+#     }
+# }
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.sendgrid.net"
