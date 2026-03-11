@@ -29,6 +29,8 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r requirements.txt
+      - name: Run make migrations
+        run: python manage.py makemigrate
       - name: Run migrations
         run: python manage.py migrate
         
@@ -78,4 +80,5 @@ jobs:
           app-name: 'h702-th-prod-03'
           slot-name: 'Production'
           
+
 
