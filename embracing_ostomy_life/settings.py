@@ -279,8 +279,8 @@ LOGGING = {
     "handlers": {
         "file": {
             "class": "logging.FileHandler",
-            "filename": env("DJANGO_LOG_FILE"),
-            "level": env("DJANGO_LOG_LEVEL"),
+            "filename": os.getenv("DJANGO_LOG_FILE"),
+            "level": os.getenv("DJANGO_LOG_LEVEL"),
             "formatter": "verbose",
         },
         "null": {
@@ -289,14 +289,14 @@ LOGGING = {
         },
         "console": {
             "class": "logging.StreamHandler",
-            "level": env("DJANGO_LOG_LEVEL"),
+            "level": os.getenv("DJANGO_LOG_LEVEL"),
             "formatter": "verbose",
         }
 
     },
     "loggers": {
         "": {
-            "level": env("DJANGO_LOG_LEVEL"),
+            "level": os.getenv("DJANGO_LOG_LEVEL"),
             "handlers": ["file", "console"],
             "propagate": True,
         },
